@@ -2,8 +2,6 @@
 
 #include <string>
 
-using std::string;
-
 class ReduceInterface
 {
 public:
@@ -12,5 +10,5 @@ public:
 
 	virtual void ProofDLLWorks() = 0;
 
-	virtual void setParameters(string OutputDirectory) = 0;
+	virtual void setParameters(std::string OutputDirectory) = 0;
 };
