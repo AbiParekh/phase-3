@@ -1,0 +1,5 @@
+Input_Directory ..\inputDir\
+Map_DLL_Location .\..\MapDLL\MapLibrary\x64\Debug\MapLibrary.dll
+Reduce_DLL_Location .\..\ReduceDLL\ReduceLib\x64\Debug\ReduceLib.dll
+Number_Of_Map_Threads 5
+Number_Of_Reduce_Threads 5
