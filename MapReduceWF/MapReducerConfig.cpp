@@ -13,7 +13,7 @@ MapReducerConfig::MapReducerConfig() :
 
 bool MapReducerConfig::parseConfigurationFile(std::string locationOfConfigurationFile)
 {
-
+	return true;
 }
 
 bool MapReducerConfig::validateDirectories()

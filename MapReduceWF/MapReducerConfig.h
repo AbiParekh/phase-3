@@ -63,4 +63,4 @@ private:
 
 	const std::string folderNameForSorterOutput = "SorterOutput";
 
-}
+};

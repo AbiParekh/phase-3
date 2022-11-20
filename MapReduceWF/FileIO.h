@@ -97,7 +97,7 @@ private:
 	/// </summary>
 	bool doGetListOfTextFiles(const std::string& inputFolder, std::vector<std::string>& fileList);
 
-	
+
 	/// <summary>
 	/// Hidden Interface 
 	/// </summary>
