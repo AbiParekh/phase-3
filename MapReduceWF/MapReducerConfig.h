@@ -48,6 +48,10 @@ protected:
 
 	bool setDefaultDirectory(std::string defaultDir);
 
+	bool parseConfigurationLine(std::string line);
+
+	bool requiredConfigurationItemsPresent();
+
 	std::string inputDirectory_;
 	std::string intermediateDirectory_;
 	std::string outputDirectory_;

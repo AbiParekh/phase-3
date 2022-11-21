@@ -37,6 +37,9 @@ public:
 	/// <returns></returns>
 	bool readFileIntoVector(const std::string filePath, const std::string fileName, std::vector<std::string>& items);
 
+	bool readFileIntoVector(const std::string filePathAndName, std::vector<std::string>& items);
+
+
 	/// <summary>
 	/// Validates the File Exist and can be opened. Assumes the user has already validated the File Path using the Valid Directory Call. 
 	/// </summary>
@@ -44,6 +47,8 @@ public:
 	/// <param name="fileName">Name of a File that EXIST within the directory of File Path</param>
 	/// <returns>Returns True if the file can be accessed </returns>
 	bool canAccessFile(const std::string& filePath, const std::string& fileName);
+
+	bool canAccessFile(const std::string& fileName);
 
 
 	/// <summary>
@@ -81,11 +86,17 @@ private:
 	/// </summary>
 	bool doReadFileIntoVector(const std::string filePath, const std::string fileName, std::vector<std::string>& items);
 
+	bool doReadFileIntoVector(const std::string filePathAndName, std::vector<std::string>& items);
+
 	/// <summary>
 	/// Hidden Interface 
 	/// </summary>
 	bool doCanAccessFile(const std::string& filePath, const std::string& fileName);
 
+	/// <summary>
+	/// Hidden Interface 
+	/// </summary>
+	bool doCanAccessFile(const std::string& filePathName);
 
 	/// <summary>
 	/// Hidden Interface 

@@ -19,10 +19,21 @@ bool FileIOManagement::readFileIntoVector(const std::string filePath, const std:
 }
 
 
+bool FileIOManagement::readFileIntoVector(const std::string filePathAndName, std::vector<std::string>& items)
+{
+	return doReadFileIntoVector(filePathAndName, items);
+}
+
+
 
 bool FileIOManagement::canAccessFile(const std::string& filePath, const std::string& fileName)
 {
 	return doCanAccessFile(filePath, fileName);
+}
+
+bool FileIOManagement::canAccessFile(const std::string& filePathName)
+{
+	return doCanAccessFile(filePathName);
 }
 
 
@@ -122,6 +133,32 @@ bool FileIOManagement::doReadFileIntoVector(const std::string filePath, const st
 	return true;
 }
 
+
+
+/// <summary>
+/// Hidden Interface 
+/// </summary>
+bool FileIOManagement::doReadFileIntoVector(const std::string filePathAndName, std::vector<std::string>& items)
+{
+	if (!canAccessFile(filePathAndName))
+	{
+		std::cout << "Error: Invalid File (" << filePathAndName << ") within the read File Into Vector Request" << std::endl;
+		return false;
+	}
+
+	std::ifstream infile(filePathAndName);
+
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		items.push_back(line);
+	}
+
+	return true;
+}
+
+
+
 /// <summary>
 /// Hidden Interface 
 /// </summary>
@@ -132,6 +169,18 @@ bool FileIOManagement::doCanAccessFile(const std::string& filePath, const std::s
 	std::ifstream infile(fileNameAndPath);
 	return infile.good();
 }
+
+
+/// <summary>
+/// Hidden Interface 
+/// </summary>
+bool FileIOManagement::doCanAccessFile(const std::string& filePathName)
+{
+	std::ifstream infile(filePathName);
+	return infile.good();
+}
+
+
 
 
 /// <summary>
