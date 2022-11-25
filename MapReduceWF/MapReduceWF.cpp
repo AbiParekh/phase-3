@@ -9,10 +9,6 @@
 #include <Windows.h>
 // PUBLIC METHODS
 
-
-typedef void* (*pvFunctv)();
-
-
 MapReducer::MapReducer(std::string configFileLocation) :
 	configurationFileLocation_(configFileLocation), 
 	mapSorter("", "") {}
@@ -43,13 +39,13 @@ bool MapReducer::doReduce(std::string& outputFileName)
 		if (!MapStepDLL(mapDLLLocation, outputMapDirectory)) return false;
 		
 
-		if (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
-		{
-			std::cout << "ERROR: Unable to Sort Mapped Files Output" << std::endl;
-			return false;
-		}
+		// SORA UNCOMMENT OUTif (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
+		// SORA UNCOMMENT OUT{
+		// SORA UNCOMMENT OUT	std::cout << "ERROR: Unable to Sort Mapped Files Output" << std::endl;
+		// SORA UNCOMMENT OUT	return false;
+		// SORA UNCOMMENT OUT}
 		
-		if (!ReduceStepDLL(reduceDLLLocation, outputReduceDirectory, sortedFileName, outputFileName)) return false;
+		// SORA UNCOMMENT OUT if (!ReduceStepDLL(reduceDLLLocation, outputReduceDirectory, sortedFileName, outputFileName)) return false;
 	}
 	else
 	{
@@ -58,12 +54,48 @@ bool MapReducer::doReduce(std::string& outputFileName)
 	return true;
 }
 
+void MapReducer::MapThreadFunction(pvFunctv CreateMap, const std::string& outputMapDirectory, const std::vector<std::string>& fileList)
+{
+	bool results = true;
+	MapInterface* mapIF = NULL;
+	mapIF = (static_cast<MapInterface*> (CreateMap()));	// get pointer to object
+	if (mapIF == nullptr)
+	{
+		std::cout << "Error: Map Interface Not implemented correctly " << std::endl;
+		results = false;
+	}
+	else
+	{
+		mapIF->setParameters(outputMapDirectory, bufferSize);
 
+		// Input Processing and Map Call for Each file 
+		for (size_t fileCount = 0; fileCount < fileList.size(); fileCount++)
+		{
+			std::vector<std::string> lines;
+			// Read Each File Into a Vector of Strings 
+			if (fileManager.readFileIntoVector(mapReduceConfig.getInputDir(), fileList.at(fileCount), lines))
+			{
+				// Call the Map Function for each Line
+				for (size_t fileLine = 0; fileLine < lines.size(); fileLine++)
+				{
+					uint32_t count = 0;
+					//Map Function --> Map
+					mapIF->createMap(fileList.at(fileCount), lines.at(fileLine));
+					std::cout << "CreateMapCall " << fileList.at(fileCount) << " " << count << std::endl;
+				}
+
+				//Map Function --> Export
+				mapIF->flushMap(fileList.at(fileCount));
+				lines.resize(0);
+			}
+		}
+	}
+}
 
 bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputMapDirectory)
 {
-	std::vector<std::string> fileList;
-	MapInterface* mapIF = NULL;
+	std::vector<std::vector<std::string>> fileListVector;
+	std::vector<std::string> CompletefileList;
 	HINSTANCE hdllMap = NULL;
 	pvFunctv CreateMap;
 
@@ -81,43 +113,40 @@ bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputM
 		}
 		else
 		{
-			mapIF = (static_cast<MapInterface*> (CreateMap()));	// get pointer to object
-			if (mapIF == nullptr)
+			// For the input Directory read the list of files 
+			fileManager.getListOfTextFiles(mapReduceConfig.getInputDir(), CompletefileList);
+			uint32_t totalMapThreads = mapReduceConfig.getNumberOfMapThreads();
+			
+			// setup fileListVector
+			for (size_t count = 0; count < totalMapThreads; count++)
 			{
-				std::cout << "Error: Map Interface Not implemented correctly " << std::endl;
-				results = false;
+				std::vector<std::string> emptyPlaceHolderVector;
+				fileListVector.push_back(emptyPlaceHolderVector);
 			}
-			else
+
+			uint32_t currentMapThread = 0;
+			for (std::string file : CompletefileList)
 			{
-				std::cout << "Prior Set Parameters" << std::endl;
-				mapIF->setParameters(outputMapDirectory, bufferSize);
-				std::cout << "Post Set Parameter" << std::endl;
-
-				// For the input Directory read the list of files 
-				fileManager.getListOfTextFiles(mapReduceConfig.getInputDir(), fileList);
-
-				// Input Processing and Map Call for Each file 
-				for (size_t fileCount = 0; fileCount < fileList.size(); fileCount++)
+				fileListVector.at(currentMapThread).push_back(file);
+				currentMapThread++;
+				if (currentMapThread % totalMapThreads == 0)
 				{
-					std::vector<std::string> lines;
-					// Read Each File Into a Vector of Strings 
-					if (fileManager.readFileIntoVector(mapReduceConfig.getInputDir(), fileList.at(fileCount), lines))
-					{
-						// Call the Map Function for each Line
-						for (size_t fileLine = 0; fileLine < lines.size(); fileLine++)
-						{
-							uint32_t count = 0;
-							//Map Function --> Map
-							mapIF->createMap(fileList.at(fileCount), lines.at(fileLine));
-							std::cout << "CreateMapCall " << fileList.at(fileCount) << " " << count << std::endl;
-						}
-
-						//Map Function --> Export
-						mapIF->flushMap(fileList.at(fileCount));
-						lines.resize(0);
-					}
+					currentMapThread = 0;
 				}
 			}
+			///////////////////////////////////// SROA DEBUG 
+			for (size_t uppercount = 0;  uppercount< fileListVector.size(); uppercount++)
+			{
+				std::vector<std::string> fileList = fileListVector.at(uppercount);
+				std::cout << "FILE LIST " << uppercount << std::endl;
+				for (std::string file : fileList)
+				{
+					std::cout << file << ", ";
+				}
+				std::cout << std::endl;
+			}
+			///////////////////////////////////// SROA DEBUG 
+			// SORA UNCOMMENT OUT MapThreadFunction(CreateMap, outputMapDirectory, fileListVector.at(currentMapThread));
 		}
 	}
 	else

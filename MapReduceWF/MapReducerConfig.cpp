@@ -22,7 +22,7 @@ bool MapReducerConfig::parseConfigurationFile(std::string locationOfConfiguratio
 	}
 	else
 	{
-		for (auto item : items)
+		for (std::string item : items)
 		{
 			if (!parseConfigurationLine(item))
 			{
