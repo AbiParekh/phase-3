@@ -193,7 +193,7 @@ bool FileIOManagement::doValidDirectory(const std::string& folderPath)
 	const std::filesystem::path sandbox{ folderPath };
 	if (!std::filesystem::exists(sandbox))
 	{
-		std::cout << "INFO: The Folder Path: " << folderPath << " does not exist" << std::endl;
+		std::cout << "INFO: Function: ValidDirectory, The Folder Path: " << folderPath << " does not exist" << std::endl;
 		return false;
 	}
 	else if (!std::filesystem::is_directory(sandbox))

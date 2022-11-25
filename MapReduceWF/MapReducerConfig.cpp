@@ -101,9 +101,11 @@ bool MapReducerConfig::validateDirectories()
 	return results;
 }
 
-bool MapReducerConfig::setDefaultDirectory(std::string defaultDir)
+bool MapReducerConfig::setDefaultDirectory(const std::string defaultDir, std::string& finalDirectoryName)
 {
-	bool results = fileManager.validDirectory("..\\" + defaultDir + "Dir_Default");
+	finalDirectoryName = "..\\" + defaultDir + "Dir_Default";
+	bool results = true;
+	results = fileManager.validDirectory(finalDirectoryName);
 
 	// check if a default directory exists
 	if (results == false)
@@ -133,7 +135,9 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 	}
 	configurationParameter = line.substr(0, pos);
 	configurationValue = line.substr(pos+1);
+#ifdef false
 	std::cout << "configurationParameter: '" << configurationParameter << "' configurationValue: '" << configurationValue << "'" << std::endl;
+#endif
 	if(configurationValue.find(" ") != std::string::npos)
 	{	
 		std::cout << "ERROR: \"" << line << "\" Not Formatted Correctly (More then 2 Words in a Single Line)" << std::endl;
@@ -142,7 +146,6 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 
 	if (configurationParameter.compare("Input_Directory") == 0)
 	{
-		std::cout << "FOUND INPUT DIRECTORY " << std::endl;
 		inputDirectory_ = configurationValue;
 	}
 	else if(configurationParameter.compare("Map_DLL_Location")			== 0) mapDllLocation_			= configurationValue;
@@ -181,14 +184,23 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 
 	if (outputDirectory_.compare("") == 0) 
 	{  // If User did not provided output Dir, then it should be created by default as it is an optional parameter
-		setDefaultDirectory("Output");
-		outputDirectory_ = "..\\Output_Default";
+//		std::cout << "INFO: Optional Parameter Output Directory Not Set" << std::endl;
+		if (setDefaultDirectory("Output", outputDirectory_) == false)
+		{
+			std::cout << "ERROR: Unable to est Output Directory. " << std::endl;
+			results =  false;
+		};
 	}
 
 	if (intermediateDirectory_.compare("") == 0)  
 	{   // If User did not provided IntermediateDirectory, then it should be created by default as it is an optional parameter
-		setDefaultDirectory("Working");
-		intermediateDirectory_ = "..\\WorkingDir_Default";
+//		std::cout << "INFO: Optional Parameter Intermediate Directory Not Set" << std::endl;
+		if (setDefaultDirectory("Working", intermediateDirectory_) == false)
+		{
+			std::cout << "ERROR: Unable to est intermediatw Directory. " << std::endl;
+			results = false;
+		};
+
 	}
 
 	if (numberOfMapThreads_ == 0)

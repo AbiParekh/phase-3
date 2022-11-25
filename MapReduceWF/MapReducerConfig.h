@@ -46,7 +46,7 @@ protected:
 
 	bool validateDirectories();
 
-	bool setDefaultDirectory(std::string defaultDir);
+	bool setDefaultDirectory(const std::string defaultDir, std::string& finalDirectoryName);
 
 	bool parseConfigurationLine(std::string line);
 
