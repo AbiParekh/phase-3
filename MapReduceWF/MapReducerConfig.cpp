@@ -132,14 +132,19 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 		return false;
 	}
 	configurationParameter = line.substr(0, pos);
-	configurationValue = line.substr(pos);
+	configurationValue = line.substr(pos+1);
+	std::cout << "configurationParameter: '" << configurationParameter << "' configurationValue: '" << configurationValue << "'" << std::endl;
 	if(configurationValue.find(" ") != std::string::npos)
-	{
+	{	
 		std::cout << "ERROR: \"" << line << "\" Not Formatted Correctly (More then 2 Words in a Single Line)" << std::endl;
 		return false;
 	}
 
-	if(configurationParameter.compare("Input_Directory")				== 0) inputDirectory_			= configurationValue;
+	if (configurationParameter.compare("Input_Directory") == 0)
+	{
+		std::cout << "FOUND INPUT DIRECTORY " << std::endl;
+		inputDirectory_ = configurationValue;
+	}
 	else if(configurationParameter.compare("Map_DLL_Location")			== 0) mapDllLocation_			= configurationValue;
 	else if(configurationParameter.compare("Reduce_DLL_Location")		== 0) reduceDllLocation_		= configurationValue;
 	else if(configurationParameter.compare("Output_Directory")			== 0) outputDirectory_			= configurationValue;
@@ -156,19 +161,19 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 bool MapReducerConfig::requiredConfigurationItemsPresent()
 {
 	bool results = true;
-	if (inputDirectory_.compare(""))
+	if (inputDirectory_.compare("") ==0)
 	{
 		std::cout << "ERROR: Input Directory not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
-	if (mapDllLocation_.compare(""))
+	if (mapDllLocation_.compare("") == 0)
 	{
 		std::cout << "ERROR: Map DLL Location not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
-	if (reduceDllLocation_.compare(""))
+	if (reduceDllLocation_.compare("") == 0)
 	{
 		std::cout << "ERROR: Reduce DLL Location not identified in Configuration File" << std::endl;
 		results = false;
