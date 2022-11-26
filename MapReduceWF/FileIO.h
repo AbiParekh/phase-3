@@ -68,11 +68,22 @@ public:
 	bool getListOfTextFiles(const std::string& inputFolder, std::vector<std::string>& fileList);
 
 	/// <summary>
-	/// 
+	/// Get the List of Text File from within that Directory if the file starts with a Parameter provided by the user.
+	/// FileList contains just the name of the file plus the extension it does not include the route to the file.
+	/// </summary>
+	/// <param name="folderPath">Existing Location of the Directory that the file should be within</param>
+	/// <param name="fileList">Vector where file names will be stored</param>
+	/// <returns>True if function was able to return fileList</returns>
+	bool getListOfTextFilesBasedOnStart(const std::string& inputFolder, const std::string& startingSubString, std::vector<std::string>& fileList);
+
+	/// <summary>
+	/// Create Directory if it does not alerady exist
 	/// </summary>
 	bool createDirectory(const std::string& folderPath, const std::string& newFolderName);
 
-
+	/// <summary>
+	/// Delete Files anad Folders in Requested Path
+	/// </summary>
 	bool deleteFile(const std::string& totalFilePath);
 
 private:
@@ -85,7 +96,10 @@ private:
 	/// Hidden Interface 
 	/// </summary>
 	bool doReadFileIntoVector(const std::string filePath, const std::string fileName, std::vector<std::string>& items);
-
+	
+	/// <summary>
+	/// Hidden Interface 
+	/// </summary>
 	bool doReadFileIntoVector(const std::string filePathAndName, std::vector<std::string>& items);
 
 	/// <summary>
@@ -114,7 +128,15 @@ private:
 	/// </summary>
 	bool doCreateDirectory(const std::string& folderPath, const std::string& newFolderName);
 
+	/// <summary>
+	/// Hidden Interface
+	/// </summary>
 	bool doDeleteFile(const std::string& totalFilePath);
+
+	/// <summary>
+	/// Hidden Interface 
+	/// </summary>
+	bool doGetListOfTextFilesBasedOnStart(const std::string& inputFolder, const std::string& startingSubString, std::vector<std::string>& fileList);
 
 
 };

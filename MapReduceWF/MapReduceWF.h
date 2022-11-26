@@ -13,6 +13,9 @@
 
 typedef void* (*pvFunctv)();
 
+void ReduceThreadFunction(std::string dllLocation, std::string outputReduceDirectory, std::vector<std::string> temp);//std::string threadname);
+
+
 class MapReducer
 {
 
@@ -22,6 +25,7 @@ public:
 	MapReducer(std::string configFileLocation);
 
 	bool reduce(std::string& outputFileName);
+
 
 private:
 
@@ -33,13 +37,15 @@ private:
 
 	bool ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputSortDirectory, const std::string&, std::string&);
 
+	bool MergeReduceThreads(const std::string& outputReduceDirectory);
+
 	// Variables with Map Reducer
 
 	const std::size_t bufferSize{ 3000 };
 
-	std::vector<std::thread> MapThreadList;
+	std::vector<std::thread> mapThreadList;
 
-	std::vector<std::thread> ReduceThreadList;
+	std::vector<std::thread> reduceThreadList;
 
 	std::string configurationFileLocation_;
 

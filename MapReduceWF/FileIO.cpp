@@ -233,6 +233,47 @@ bool FileIOManagement::doGetListOfTextFiles(const std::string& inputFolder, std:
 	return result;
 }
 
+bool FileIOManagement::getListOfTextFilesBasedOnStart(const std::string& inputFolder, const std::string& startingSubString, std::vector<std::string>& fileList)
+{
+	return doGetListOfTextFilesBasedOnStart(inputFolder, startingSubString, fileList);
+}
+
+bool FileIOManagement::doGetListOfTextFilesBasedOnStart(const std::string& inputFolder, const std::string& startingSubString, std::vector<std::string>& fileList)
+{
+	bool result = true;
+	if (validDirectory(inputFolder))
+	{
+		for (const auto& entry : fs::directory_iterator(inputFolder))
+		{
+			if ((entry.path().has_extension()) && (entry.path().extension().string().compare(".txt") == 0))
+			{
+				std::string tempFileName = entry.path().filename().string();
+
+				// Ensure the File Name is not smaller then the substring before attempting check
+				if (tempFileName.size() > startingSubString.size())
+				{
+					//Find the Starting String and Verify it starts at Position 0
+					size_t pos = tempFileName.find(startingSubString);
+					if (pos != std::string::npos && pos == 0)
+					{
+						fileList.push_back(entry.path().filename().string());
+					}
+				}
+			}
+			else
+			{
+				std::cout << "Warning: Ignoring the file " << entry.path().filename() << " as it is not a text file " << std::endl;
+			}
+		}
+
+	}
+	else
+	{
+		std::cout << "ERROR: Unable to get File List from Directory " << inputFolder << std::endl;
+		result = false;
+	}
+	return result;
+}
 
 /// <summary>
 /// Hidden Interface 

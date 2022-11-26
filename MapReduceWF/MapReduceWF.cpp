@@ -9,6 +9,11 @@
 #include <Windows.h>
 // PUBLIC METHODS
 
+void randomFunctionGenerator()
+{
+	std::cout << "FUCK YOUR COUCH" << std::endl;
+}
+
 MapReducer::MapReducer(std::string configFileLocation) :
 	configurationFileLocation_(configFileLocation), 
 	mapSorter("", "") {}
@@ -26,7 +31,7 @@ after it completes it flushes and empties the cache. Now calling the sorter clas
 Later the reducer is called to collect each instance for a ketword and sum it to reduce the amount of memory used by each value. after completion it exports the data
 to the outputDirectory*/
 bool MapReducer::doReduce(std::string& outputFileName)
-{	
+{	/*
 	if (mapReduceConfig.parseConfigurationFile(configurationFileLocation_))
 	{
 		std::shared_ptr<MapInterface> mapIF = nullptr;
@@ -37,20 +42,23 @@ bool MapReducer::doReduce(std::string& outputFileName)
 		std::string mapDLLLocation = mapReduceConfig.getMapDllLocation();
 		std::string reduceDLLLocation = mapReduceConfig.getReduceDllLocation();
 		if (!MapStepDLL(mapDLLLocation, outputMapDirectory)) return false;
-		
 
-		// SORA UNCOMMENT OUTif (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
-		// SORA UNCOMMENT OUT{
-		// SORA UNCOMMENT OUT	std::cout << "ERROR: Unable to Sort Mapped Files Output" << std::endl;
-		// SORA UNCOMMENT OUT	return false;
-		// SORA UNCOMMENT OUT}
-		
-		// SORA UNCOMMENT OUT if (!ReduceStepDLL(reduceDLLLocation, outputReduceDirectory, sortedFileName, outputFileName)) return false;
 	}
 	else
 	{
 		return false;
 	}
+	*/
+
+	// SORA UNCOMMENT OUTif (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
+	// SORA UNCOMMENT OUT{
+	// SORA UNCOMMENT OUT	std::cout << "ERROR: Unable to Sort Mapped Files Output" << std::endl;
+	// SORA UNCOMMENT OUT	return false;
+	// SORA UNCOMMENT OUT}
+
+	// SORA UNCOMMENT OUT if (!ReduceStepDLL(reduceDLLLocation, outputReduceDirectory, sortedFileName, outputFileName)) return false;
+	std::string temp, temp2, temp3, temp4;
+	ReduceStepDLL("", "", "", temp4);
 	return true;
 }
 
@@ -124,6 +132,7 @@ bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputM
 				fileListVector.push_back(emptyPlaceHolderVector);
 			}
 
+			// Split up Total File list based on the number of Map Threads
 			uint32_t currentMapThread = 0;
 			for (std::string file : CompletefileList)
 			{
@@ -134,19 +143,14 @@ bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputM
 					currentMapThread = 0;
 				}
 			}
-			///////////////////////////////////// SROA DEBUG 
-			for (size_t uppercount = 0;  uppercount< fileListVector.size(); uppercount++)
-			{
-				std::vector<std::string> fileList = fileListVector.at(uppercount);
-				std::cout << "FILE LIST " << uppercount << std::endl;
-				for (std::string file : fileList)
-				{
-					std::cout << file << ", ";
-				}
-				std::cout << std::endl;
-			}
-			///////////////////////////////////// SROA DEBUG 
-			// SORA UNCOMMENT OUT MapThreadFunction(CreateMap, outputMapDirectory, fileListVector.at(currentMapThread));
+
+			// Create Map Thread Loop
+				// Create Map Threads with MapThreadFunction and their File List 
+				// Push Thread Back On Pack
+			
+			// Wait Until Map Theards are done via Conditional Variable
+			// Join Threads in Vector
+
 		}
 	}
 	else
@@ -159,46 +163,93 @@ bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputM
 }
 
 
-bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputSortDirectory, const std::string& sortedFileName, std::string& outputFileName)
+bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputMapDirectory, const std::string& outputReduceDirectory, std::string& outputFileName)
 {
+	// CONSTANTS FOR TESTING JUST A PIECE
+	std::string outputMapDirectory2 = "..\\WorkingDir_Default\\MapOutput";
+	std::string reduceDLLLocation = ".\\..\\ReduceDLL\\ReduceLib\\x64\\Debug\\ReduceLib.dll";
+	uint32_t numberofReduceThreads = 2;
+
+
 	bool result = true;
+	std::vector<std::vector<std::string>> fileListVector;
+	
+	// Get File List for Reducer Threads
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+		std::vector<std::string> fileList;
+		std::string startingSubString = "r" + std::to_string(Rthreads) + "_";
+		fileManager.getListOfTextFilesBasedOnStart(outputMapDirectory2, startingSubString, fileList);
+		fileListVector.push_back(fileList);
+	}
+
+	// Launch Reducer Threads
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+			std::cout << "INFO: Launching Reducer Thread #" << Rthreads << std::endl;
+			std::vector<std::string> fileList = fileListVector.at(Rthreads);
+			std::thread reduceThread(&ReduceThreadFunction, reduceDLLLocation, outputReduceDirectory, fileListVector.at(Rthreads));
+
+			reduceThreadList.push_back(std::move(reduceThread));
+	}
+			
+	
+	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+		std::cout << "JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
+
+		if (reduceThreadList.at(Rthreads).joinable() == true)
+		{
+			std::cout << "POST JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
+			reduceThreadList.at(Rthreads).join();
+			std::cout << "POST JOIN CHECK FOR THREAD" << Rthreads << std::endl;
+		}
+	}
+
+	return result;
+}
+
+void ReduceThreadFunction(std::string ReduceDllLocation, std::string outputReduceDirectory, std::vector<std::string> fileList)
+{
+
 	HINSTANCE hdllReduce = NULL;
-	ReduceInterface* piReduce = NULL;
 	pvFunctv CreateReduce;
-	hdllReduce = LoadLibraryA(dllLocaiton.c_str());
+	hdllReduce = LoadLibraryA(ReduceDllLocation.c_str());
 	if (hdllReduce != NULL)
 	{
 		CreateReduce = (pvFunctv)(GetProcAddress(hdllReduce, "CreateReduceClassInstance"));
 		if (CreateReduce != nullptr)
 		{
+			ReduceInterface* piReduce = NULL;
 			piReduce = static_cast<ReduceInterface*> (CreateReduce());	// get pointer to object
-
 			if (piReduce != NULL)
 			{
-				piReduce->setParameters(mapReduceConfig.getOutputDir());
-				if (!piReduce->reduceFile(outputSortDirectory, sortedFileName, outputFileName)) // Pulls File and puts entire line into Vect
-				{
-					std::cout << "ERROR: Unable to import Sorted Data into Reducer" << std::endl;
-					result = false;
-				}
+				piReduce->setParameters(outputReduceDirectory);
+				//if(!piReduce->reduceFile(outputSortDirectory, sortedFileName, outputFileName)) // Pulls File and puts entire line into Vect
+				//{
+				//	std::cout << "ERROR: Unable to import Sorted Data into Reducer" << std::endl;
+				//	result = false;
+				//}
 			}
 			else
 			{
 				std::cout << "Error: Could not create ReduceInterface Class." << std::endl;
-				result = false;
 			}
 		}
 		else
 		{
-			std::cout << "Error: Did not load CreateReduceClassInstance correctly." << std::endl;
-			result = false;
+			std::cout << "Error: Could not create ReduceInterface Class." << std::endl;
 		}
+
 	}
 	else
 	{
 		std::cout << "Error: Reduce Library load failed!" << std::endl;
-		result = false;
 	}
-	return result;
 }
 
+	// Sort ALL Files 
+	// Create Reducer File
+	// Publish Results to a File
