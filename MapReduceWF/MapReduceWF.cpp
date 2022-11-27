@@ -31,24 +31,25 @@ after it completes it flushes and empties the cache. Now calling the sorter clas
 Later the reducer is called to collect each instance for a ketword and sum it to reduce the amount of memory used by each value. after completion it exports the data
 to the outputDirectory*/
 bool MapReducer::doReduce(std::string& outputFileName)
-{	/*
+{	
 	if (mapReduceConfig.parseConfigurationFile(configurationFileLocation_))
 	{
 		std::shared_ptr<MapInterface> mapIF = nullptr;
 		std::vector<std::string> fileList;
 		std::string sortedFileName;
+		std::string inputMapDirectory = mapReduceConfig.getInputDir();
 		std::string outputMapDirectory = mapReduceConfig.getIntermediateDir() + "\\" + mapReduceConfig.getMapTempOutputFolder();
 		std::string outputReduceDirectory = mapReduceConfig.getIntermediateDir() + "\\" + mapReduceConfig.getReduceTempOutputFolder();
 		std::string mapDLLLocation = mapReduceConfig.getMapDllLocation();
 		std::string reduceDLLLocation = mapReduceConfig.getReduceDllLocation();
-		if (!MapStepDLL(mapDLLLocation, outputMapDirectory)) return false;
+		if (!MapStepDLL(mapDLLLocation, inputMapDirectory, outputMapDirectory)) return false;
 
 	}
 	else
 	{
 		return false;
 	}
-	*/
+	
 
 	// SORA UNCOMMENT OUTif (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
 	// SORA UNCOMMENT OUT{
@@ -61,15 +62,19 @@ bool MapReducer::doReduce(std::string& outputFileName)
 	ReduceStepDLL("", "", "", temp4);
 	return true;
 }
-bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputMapDirectory)
+bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMapDirectory, const std::string& outputMapDirectory)
 {
 	std::vector<std::vector<std::string>> fileListVector;
 	std::vector<std::string> CompletefileList;
+	std::string mapDLLLocation = dllLocation;
+	uint32_t bufferSize = 3000;
+
 	bool results = true;
 		
 	// For the input Directory read the list of files 
 	fileManager.getListOfTextFiles(mapReduceConfig.getInputDir(), CompletefileList);
 	uint32_t totalMapThreads = mapReduceConfig.getNumberOfMapThreads();
+	uint32_t totalReduceThreads = mapReduceConfig.getNumberOfReduceThreads();
 		
 	// setup fileListVector
 	for (size_t count = 0; count < totalMapThreads; count++)
@@ -92,66 +97,40 @@ bool MapReducer::MapStepDLL(std::string& dllLocaiton, const std::string& outputM
 
 	// CREATE THREADS LOGIC
 
+
+		// Launch Map Threads
+	for (uint32_t Mthreads = 0; Mthreads < totalMapThreads; Mthreads++)
+	{
+		std::cout << "INFO: Launching Map Thread #" << Mthreads << std::endl;
+		std::string threadID = "m" + std::to_string(Mthreads);
+		std::vector<std::string> fileList = fileListVector.at(Mthreads);
+
+		//void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string>&fileList, uint32_t bufferSize, std::string threadname, );
+
+		std::thread mapThread(MapThreadFunction, mapDLLLocation, inputMapDirectory, outputMapDirectory, fileList, bufferSize, threadID, totalReduceThreads);
+		mapThreadList.push_back(std::move(mapThread));
+	}
+
 	// CONDITONAL VARIABLE LOGIC
+	// ESA TODO: setup condition_Variable to handle async writes to MapOutput
+
 
 	// JOIN THREADS LOGIC
+	for (uint32_t Mthreads = 0; Mthreads < totalMapThreads; Mthreads++)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		mapThreadList[Mthreads].join();
+	}
 
 	// Verify all Map Files were created
 
 	return results;
 
 }
-
-bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputMapDirectory, const std::string& outputReduceDirectory, std::string& outputFileName)
-{
-	// CONSTANTS FOR TESTING JUST A PIECE
-	std::string outputMapDirectory2 = "..\\WorkingDir_Default\\MapOutput";
-	std::string reduceDLLLocation = ".\\..\\ReduceDLL\\ReduceLib\\x64\\Debug\\ReduceLib.dll";
-	uint32_t numberofReduceThreads = 2;
+//void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string>&fileList, uint32_t bufferSize, std::string threadname, );
 
 
-	bool result = true;
-	std::vector<std::vector<std::string>> fileListVector;
-	
-	// Get File List for Reducer Threads
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
-	{
-		std::vector<std::string> fileList;
-		std::string startingSubString = "r" + std::to_string(Rthreads) + "_";
-		fileManager.getListOfTextFilesBasedOnStart(outputMapDirectory2, startingSubString, fileList);
-		fileListVector.push_back(fileList);
-	}
-
-	// Launch Reducer Threads
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
-	{
-			std::cout << "INFO: Launching Reducer Thread #" << Rthreads << std::endl;
-			std::string threadID = "r" + std::to_string(Rthreads);
-			std::vector<std::string> fileList = fileListVector.at(Rthreads);
-			std::thread reduceThread(&ReduceThreadFunction, reduceDLLLocation, outputReduceDirectory, fileListVector.at(Rthreads), threadID, outputMapDirectory2);
-
-			reduceThreadList.push_back(std::move(reduceThread));
-	}
-			
-	
-	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
-
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
-	{
-		std::cout << "JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
-
-		if (reduceThreadList.at(Rthreads).joinable() == true)
-		{
-			std::cout << "POST JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
-			reduceThreadList.at(Rthreads).join();
-			std::cout << "POST JOIN CHECK FOR THREAD" << Rthreads << std::endl;
-		}
-	}
-
-	return result;
-}
-
-void MapThreadFunction(std::string dllLocation, std::string outputMapDirectory, std::vector<std::string>& fileList, std::string inputDirectory, uint32_t bufferSize)
+void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads)
 {
 	HINSTANCE hdllMap = NULL;
 	pvFunctv CreateMap;
@@ -175,7 +154,7 @@ void MapThreadFunction(std::string dllLocation, std::string outputMapDirectory, 
 			}
 			else
 			{
-				mapIF->setParameters(outputMapDirectory, bufferSize);
+				mapIF->setParameters(outputMapDirectory, bufferSize, totalReduceThreads);
 
 				// Input Processing and Map Call for Each file 
 				for (size_t fileCount = 0; fileCount < fileList.size(); fileCount++)
@@ -204,6 +183,56 @@ void MapThreadFunction(std::string dllLocation, std::string outputMapDirectory, 
 	{
 		std::cout << "Error: Map Library load failed!" << std::endl;
 	}
+}
+
+
+bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputMapDirectory, const std::string& outputReduceDirectory, std::string& outputFileName)
+{
+	// CONSTANTS FOR TESTING JUST A PIECE
+	std::string outputMapDirectory2 = "..\\WorkingDir_Default\\MapOutput";
+	std::string reduceDLLLocation = ".\\..\\ReduceDLL\\ReduceLib\\x64\\Debug\\ReduceLib.dll";
+	uint32_t numberofReduceThreads = 2;
+
+
+	bool result = true;
+	std::vector<std::vector<std::string>> fileListVector;
+
+	// Get File List for Reducer Threads
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+		std::vector<std::string> fileList;
+		std::string startingSubString = "r" + std::to_string(Rthreads) + "_";
+		fileManager.getListOfTextFilesBasedOnStart(outputMapDirectory2, startingSubString, fileList);
+		fileListVector.push_back(fileList);
+	}
+
+	// Launch Reducer Threads
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+		std::cout << "INFO: Launching Reducer Thread #" << Rthreads << std::endl;
+		std::string threadID = "r" + std::to_string(Rthreads);
+		std::vector<std::string> fileList = fileListVector.at(Rthreads);
+		std::thread reduceThread(&ReduceThreadFunction, reduceDLLLocation, outputReduceDirectory, fileListVector.at(Rthreads), threadID, outputMapDirectory2);
+
+		reduceThreadList.push_back(std::move(reduceThread));
+	}
+
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+
+	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	{
+		std::cout << "JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
+
+		if (reduceThreadList.at(Rthreads).joinable() == true)
+		{
+			std::cout << "POST JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
+			reduceThreadList.at(Rthreads).join();
+			std::cout << "POST JOIN CHECK FOR THREAD" << Rthreads << std::endl;
+		}
+	}
+
+	return result;
 }
 
 void ReduceThreadFunction(std::string ReduceDllLocation, std::string outputReduceDirectory, std::vector<std::string> fileList, std::string threadID, std::string MapFilesDirectory) 
