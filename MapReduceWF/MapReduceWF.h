@@ -59,25 +59,3 @@ private:
 
 };
 
-
-
-// Singleton Design Pattern for tracking Thread List across multiple threads
-class ReducerSingleton
-{
-private:
-	ReducerSingleton() {}
-	std::vector<std::string> threadIdList;
-	std::mutex threadIdListMutex;
-public:
-	static ReducerSingleton& getInstance()
-	{
-		std::mutex mutex;
-		std::scoped_lock lock{ mutex };
-		static ReducerSingleton theInstance;
-		return theInstance;
-	}
-
-	void addReducerThreadID(std::string id);
-
-	void RemoveReducerThreadID(std::string threadId);
-};
