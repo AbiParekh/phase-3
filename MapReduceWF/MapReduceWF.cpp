@@ -3,12 +3,16 @@
 
 // mapReduceCMake.cpp : Defines the entry point for the application.
 
+#include <condition_variable>
+#include <mutex>
+#include <iostream>
 
 #include "MapReduceWF.h"
-#include <iostream>
 #include <Windows.h>
 
 
+std::condition_variable cv_Reduce;
+std::mutex cvReduce_m;
 
 // PUBLIC METHODS
 
@@ -146,6 +150,7 @@ void MapReducer::exportSuccess()
 
 bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputMapDirectory, const std::string& outputReduceDirectory, std::string& outputFileName)
 {
+	ReducerSingleton& reduceSingleton = ReducerSingleton::getInstance();
 	bool result = true;
 	std::vector<std::vector<std::string>> fileListVector;
 	uint32_t numberOfReduceThreads = mapReduceConfig.getNumberOfReduceThreads();
@@ -163,14 +168,15 @@ bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string
 	{
 		std::cout   << __func__ <<  "INFO: Launching Reducer Thread #" << Rthreads << std::endl;
 		std::string threadID = "r" + std::to_string(Rthreads);
+		reduceSingleton.addReducerThreadID(threadID);
 		std::vector<std::string> fileList = fileListVector.at(Rthreads);
 		std::thread reduceThread(&ReduceThreadFunction, dllLocaiton, outputReduceDirectory, fileListVector.at(Rthreads), threadID, outputMapDirectory);
 
 		reduceThreadList.push_back(std::move(reduceThread));
 	}
 
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+	std::unique_lock<std::mutex> lk(cvReduce_m);
+	cv_Reduce.wait(lk, [] {return true; });
 
 	for (uint32_t Rthreads = 0; Rthreads < numberOfReduceThreads; Rthreads++)
 	{
@@ -248,7 +254,6 @@ void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std:
 
 void ReduceThreadFunction(std::string ReduceDllLocation, std::string outputReduceDirectory, std::vector<std::string> fileList, std::string threadID, std::string MapFilesDirectory) 
 {
-
 	HINSTANCE hdllReduce = NULL;
 	pvFunctv CreateReduce;
 	hdllReduce = LoadLibraryA(ReduceDllLocation.c_str());
@@ -283,5 +288,34 @@ void ReduceThreadFunction(std::string ReduceDllLocation, std::string outputReduc
 	else
 	{
 		std::cout   << __func__ <<  "Error: Reduce Library load failed!" << std::endl;
+	}
+	ReducerSingleton& reduceSingleton = ReducerSingleton::getInstance();
+	reduceSingleton.RemoveReducerThreadID(threadID);
+}
+
+
+// Singleton Design Pattern for tracking Thread List across multiple threads
+void ReducerSingleton::addReducerThreadID(std::string id)
+{
+	std::scoped_lock lock{ threadIdListMutex };
+	threadIdList.push_back(id);
+}
+
+void ReducerSingleton::RemoveReducerThreadID(std::string threadId)
+{
+	std::scoped_lock lock{ threadIdListMutex };
+	std::vector<std::string>::iterator findLocation = std::find(threadIdList.begin(), threadIdList.end(), threadId);
+	if (findLocation != threadIdList.end())
+	{
+		threadIdList.erase(findLocation);
+	}
+	else
+	{
+		std::cout << __func__ << " ERROR: Unable to Find Reducer ThreadID in Thread List " << std::endl;
+	}
+
+	if (threadIdList.size() == 0)
+	{
+		cv_Reduce.notify_all();
 	}
 }

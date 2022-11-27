@@ -5,18 +5,19 @@
 #include <vector>
 #include <string>
 #include <thread>	
+#include <mutex>
+#include <iostream>
+
 #include "FileIO.h"
 #include "MapReducerConfig.h"
 #include "ReduceInterface.h"
 #include "MapInterface.h"
-#include <mutex>
-//#include <queue>
 
 
 typedef void* (*pvFunctv)();
 
-void ReduceThreadFunction(std::string dllLocation, std::string outputReduceDirectory, std::vector<std::string> temp, std::string threadname, std::string MapFilesDirectory);
-void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads, std::mutex & mtx, std::condition_variable& cond);
+void ReduceThreadFunction(std::string ReduceDllLocation, std::string outputReduceDirectory, std::vector<std::string> fileList, std::string threadID, std::string MapFilesDirectory);
+void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads, std::mutex& mtx, std::condition_variable& cond);
 
 class MapReducer
 {
@@ -56,4 +57,27 @@ private:
 	// Map Object 
 	FileIOManagement fileManager;
 
+};
+
+
+
+// Singleton Design Pattern for tracking Thread List across multiple threads
+class ReducerSingleton
+{
+private:
+	ReducerSingleton() {}
+	std::vector<std::string> threadIdList;
+	std::mutex threadIdListMutex;
+public:
+	static ReducerSingleton& getInstance()
+	{
+		std::mutex mutex;
+		std::scoped_lock lock{ mutex };
+		static ReducerSingleton theInstance;
+		return theInstance;
+	}
+
+	void addReducerThreadID(std::string id);
+
+	void RemoveReducerThreadID(std::string threadId);
 };
