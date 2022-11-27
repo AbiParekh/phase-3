@@ -25,62 +25,85 @@ Reduce::~Reduce()
 //destructor
 {};
 
-void Reduce::setParameters(std::string OutputDirIn)
+void Reduce::setParameters(std::string OutputDirIn, std::string ThreadName)
 {
     outputDirectory = OutputDirIn;
+    threadName = ThreadName;
 }
+
+
 
 //from sorter grab the sorted data 
 //then insert the data into an input vector, then send it to the reduce method
-bool Reduce::reduceFile(const string& folderPath, const string& fileName, std::string& outputFile)
+bool Reduce::reduceFile(const string& folderPath, const string& fileName)
 {
-    outputFile = outputFileName;
-
-    //declare an empty vector
-    std::vector<std::string> vec;
-    bool dataAttained = true;
-
-    if (IO_management.readFileIntoVector(folderPath, fileName, vec))
+    bool results = true;
+    if (!AddFileContentsToSorter(folderPath, fileName));
     {
-
-        for (size_t currentLine = 0; currentLine < vec.size(); ++currentLine)
-        {
-
-            if (!reduce(vec.at(currentLine)))
-            {
-                std::cout << "ERROR: Failure attempting to reduce line \"" << vec.at(currentLine) << "\"" << std::endl;
-            }
-        }
-        exportSuccess();
+        std::cout << "Error: Unable to add File: " << folderPath << "\\" << fileName << "To Sorted List" << std::endl;
+        results = false;
     }
-    else
-    {
-        std::cout << "ERROR: Sorted data was not imported to reducer" << std::endl;
-        dataAttained = false;
-    }
-
-    return dataAttained;
+    
+    return results;
 }
 
-/*The reduce method within Reduce class takes string line as an input
-a vector outputPair is initialized
-the reduce method will parse the input line and extract the key value pairs*/
-bool Reduce::reduce(const std::string line)
+bool Reduce::AddFileContentsToSorter(const std::string& folderPath, const std::string& fileName)
 {
-    std::pair<std::string, uint32_t> outputPair;
-    if (parseLine(line, outputPair))
-    {
+    std::vector<std::string> lines;
+    const std::string WORD_WRAP = "\"";
+    bool result = true;
 
-        Export(outputFileName, outputPair);
+    if (IO_management.readFileIntoVector(folderPath, fileName, lines))
+    {
+        for (size_t fileLine = 0; fileLine < lines.size(); fileLine++)
+        {
+            AddPhraseToMap(lines.at(fileLine), WORD_WRAP, WORD_WRAP);
+        }
     }
     else
     {
-        std::cout << std::endl;
+        result = false;
     }
+    return result;
+}
+
+bool Reduce::AddPhraseToMap(const std::string& phrase, const std::string& startString, const std::string& endString)
+{
+    std::string isolateWord;
+    if (IsolateWord(phrase, startString, endString, isolateWord))
+    {
+        std::map<std::string, uint32_t>::iterator mapIterator = sortedMap.find(isolateWord);
+        if (mapIterator == sortedMap.end())
+        {
+            // The word was not found in the Map therefore add it 
+            sortedMap.insert(std::pair<std::string, uint32_t>(isolateWord, 1));
+        }
+        else
+        {
+            // The Word was found in the map increment it
+            mapIterator->second = mapIterator->second + 1;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+/*The IsolateWord function within the Reduce class has parameters string word, the start of the string, the end of the string, and the isolated string word
+the function locates the first position of the string this assigned as the startString, and it locates the second portion of the string and it assigns this as endsString
+It then formats the strings into a sub string and assigns it to the isolated string.*/
+bool Reduce::IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord)
+{
+    size_t firstPosition = formattedWord.find(startString);
+    size_t secondPosition = formattedWord.find(endString, firstPosition + 1);
+    if ((firstPosition == std::string::npos) || (secondPosition == std::string::npos)) return false;
+    isloatedWord = formattedWord.substr(firstPosition + 1, secondPosition - (firstPosition + 1));
 
     return true;
-
 }
+
 
 /*the Export function within the Reduce class will take fileName, and vector from method reduce
 it will first format the output in order to read the keys on left side and the value on the right
@@ -95,33 +118,6 @@ bool Reduce::Export(const std::string& fileName, std::pair<std::string, uint32_t
     return true;
 }
 
-/*the parseLine function within Reduce class accepts a line of string, and a vector from the reduce method from earlier
-this function uses the methods IsolateWord and getNumberOfInstances in order to isolate the words from its values
-and stores it back into outputPair vector*/
-bool Reduce::parseLine(const std::string line, std::pair<std::string, uint32_t>& outputPair)
-{
-    bool result = true;
-    std::string temp = line;
-    std::string isoWord;
-    uint32_t instances;
-    const std::string finalLine;
-
-    if (!IsolateWord(line, "\"", "\"", isoWord))
-    {
-        std::cout << "ERROR: Unable to get key word from Line " << std::endl;
-    }
-    else if (!getNumberOfInstances(temp, ",", instances))
-    {
-        std::cout << "Error: Unable to get Instances for key " << isoWord << std::endl;
-        result = false;
-    }
-    else
-    {
-        outputPair = std::make_pair(isoWord, instances);
-    }
-
-    return result;
-}
 
 /*the getNumberOfInstances function within Reduce class collects all the 1s for a particular keyword
 and it stores the final value into the vector called instance*/
@@ -139,18 +135,7 @@ bool Reduce::getNumberOfInstances(std::string format, std::string delim, uint32_
     return true;
 }
 
-/*The IsolateWord function within the Reduce class has parameters string word, the start of the string, the end of the string, and the isolated string word
-the function locates the first position of the string this assigned as the startString, and it locates the second portion of the string and it assigns this as endsString
-It then formats the strings into a sub string and assigns it to the isolated string.*/
-bool Reduce::IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord)
-{
-    size_t firstPosition = formattedWord.find(startString);
-    size_t secondPosition = formattedWord.find(endString, firstPosition + 1);
-    if ((firstPosition == std::string::npos) || (secondPosition == std::string::npos)) return false;
-    isloatedWord = formattedWord.substr(firstPosition + 1, secondPosition - (firstPosition + 1));
 
-    return true;
-}
 
 /*exportSuccess is a method within Reduce CLASS which executes when the entire process has completed
 it will write an output file named success.txt with the tempVector in it
@@ -166,3 +151,8 @@ void Reduce::exportSuccess()
     IO_management.writeVectorToFile(outputDirectory, fileName, tempVector);
     return;
 }
+
+
+
+
+
