@@ -119,7 +119,7 @@ string Map::lowerCaseMap(const string& input)
 	return output;
 }
 
-bool Map::createMap(const string filename, const string strCAPS)
+bool Map::createMap(const string filename, const string strCAPS, std::mutex& mtx)
 {
 	bool isExported{ false };
 	string parsedWord, str{ lowerCaseMap(strCAPS) };
@@ -129,11 +129,10 @@ bool Map::createMap(const string filename, const string strCAPS)
 		//((!iswalnum(str[tokenEnd]) && !(str[tokenEnd] == '\'')) || tokenEnd == str.length()) //checks if char is not alphanumeric (iswalnum) or apostrophe
 		if (removePunctuation(str, tokenStart, tokenEnd))
 		{
-
 			if (tokenStart != tokenEnd) //not first char in word
 			{
 				parsedWord = str.substr(tokenStart, tokenEnd - tokenStart);
-				isExported = exportMap(filename, parsedWord);
+				isExported = exportMap(filename, parsedWord, mtx);
 				tokenStart = tokenEnd + 1;	// moves word start to next char
 			}
 			else if (tokenStart == tokenEnd) //first char in word is a punct
@@ -145,9 +144,9 @@ bool Map::createMap(const string filename, const string strCAPS)
 	return isExported;
 };
 
-bool Map::flushMap(const string fileName)
+bool Map::flushMap(const string fileName, std::mutex& mtx)
 {
-	bool isFlushed = exportMap(fileName, "");
+	bool isFlushed = exportMap(fileName, "", mtx);
 	std::cout << "Mapped " << fileIndex << " Partition(s) of " << fileName << " to tempDirectory: " << this->tempDirectory << std::endl;
 	fileIndex = 0;
 	return isFlushed; //nothing to flush
@@ -179,16 +178,16 @@ bool Map::emptyCache()
 	return isEmptied; //False if no cache emptied
 }
 
-bool Map::exportMap(const string filename, string token)
+bool Map::exportMap(const string filename, string token, std::mutex& mtx)
 {
 	bool isExported{ false };
 
-	if (token != "") tokenWords.push_back(std::make_pair(token, 1)); //does not execute on flushMap
+	//does not execute on flushMap
+	if (token != "") tokenWords.push_back(std::make_pair(token, 1)); 
 
-	if (tokenWords.size() == maxBufferSize || token == "") // Buffer reached or flush called dump to FileIO
+	// Buffer reached or flush called dump to FileIO
+	if (tokenWords.size() == maxBufferSize || token == "") 
 	{
-		//std::cout << "cache is full, exporting to file" << std::endl;
-		//isExported = exportMap(filename, fileIndex);
 		std::cout << "\n****R_Threads: " << R_threads << std::endl;
 		bool isExported = emptyCache();
 		vector<string> tempFiles;
@@ -202,7 +201,9 @@ bool Map::exportMap(const string filename, string token)
 			for (int R = 0; R < R_threads; R++)
 			{
 				tempFiles.push_back("R" + std::to_string(R) + "_" + filename);
+				std::unique_lock<std::mutex> lock(mtx);
 				mapFileManager.writeVectorToFile(this->tempDirectory, tempFiles[R], exportBuffers[R], true);
+				lock.unlock();
 			}
 		}
 	}

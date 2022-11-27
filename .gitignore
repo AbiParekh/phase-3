@@ -1,2 +1,14 @@
 # User-specific files
 x64/
+*.sqlite
+*.lock
+*.vsidx
+*.db
+*.wsuo
+*.ipch
+*.suo
+*.db-shm
+*.db-wal
+*.opendb
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
