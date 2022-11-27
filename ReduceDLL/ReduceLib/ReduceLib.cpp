@@ -31,6 +31,10 @@ void Reduce::setParameters(std::string OutputDirIn, std::string ThreadName)
     threadName = ThreadName;
 }
 
+void Reduce::ProofDLLWorks()
+{
+    std::cout << "THIS IS PROOF THE REDUCE DLL IS WORKING!" << std::endl;
+}
 
 
 //from sorter grab the sorted data 
@@ -38,9 +42,9 @@ void Reduce::setParameters(std::string OutputDirIn, std::string ThreadName)
 bool Reduce::reduceFile(const string& folderPath, const string& fileName)
 {
     bool results = true;
-    if (!AddFileContentsToSorter(folderPath, fileName));
+    if (!AddFileContentsToSorter(folderPath, fileName))
     {
-        std::cout << "Error: Unable to add File: " << folderPath << "\\" << fileName << "To Sorted List" << std::endl;
+        std::cout   << __func__ << "Error: Unable to add File: " << folderPath << "\\" << fileName << "To Sorted List" << std::endl;
         results = false;
     }
     
@@ -105,54 +109,21 @@ bool Reduce::IsolateWord(const std::string& formattedWord, const std::string& st
 }
 
 
-/*the Export function within the Reduce class will take fileName, and vector from method reduce
-it will first format the output in order to read the keys on left side and the value on the right
-a vector called tempVector is initialized to hold the formatted pairs
-IO management class is called to write the tempVector to the outputDirectory*/
-bool Reduce::Export(const std::string& fileName, std::pair<std::string, uint32_t>& outputPair)
-{
-    std::string formattedOutput = "\"" + outputPair.first + "\", " + std::to_string(outputPair.second);
-    std::vector<std::string> tempVector;
-    tempVector.push_back(formattedOutput);
-    IO_management.writeVectorToFile(outputDirectory, fileName, tempVector, true);
-    return true;
-}
 
-
-/*the getNumberOfInstances function within Reduce class collects all the 1s for a particular keyword
-and it stores the final value into the vector called instance*/
-bool Reduce::getNumberOfInstances(std::string format, std::string delim, uint32_t& instance)
+void Reduce::exportResults()
 {
-    size_t firstPosition = format.find(delim);
-    if (firstPosition == std::string::npos)
+    std::vector<std::string> outputVector;
+    for (std::map<std::string, uint32_t>::iterator mapIterator = sortedMap.begin(); mapIterator != sortedMap.end(); ++mapIterator)
     {
-        return false;
+        std::string formattedOutput = "(\"" + mapIterator->first + "\", " + std::to_string(mapIterator->second) + ")";
+        outputVector.push_back(formattedOutput);
     }
-    size_t formatSize = format.size();
-    std::string subString = format.substr(firstPosition);
-    std::string::difference_type n = std::count(subString.begin(), subString.end(), '1');
-    instance = static_cast<uint32_t>(n);
-    return true;
+    std::string fileName = threadName + "_" + outputFileName;
+    if (!IO_management.writeVectorToFile(outputDirectory, fileName, outputVector))
+    {
+        std::cout   << __func__ << "ERROR: Unable to Write Sorted Map File " << std::endl;
+    }
 }
-
-
-
-/*exportSuccess is a method within Reduce CLASS which executes when the entire process has completed
-it will write an output file named success.txt with the tempVector in it
-it will use IO management class to push the file to the output directory*/
-void Reduce::exportSuccess()
-{
-    //write success and export it to an output file
-    //after the entire input vector has been reduced and outputed.
-
-    std::string fileName = "success.txt";
-    std::vector<std::string> tempVector;
-    tempVector.push_back("");
-    IO_management.writeVectorToFile(outputDirectory, fileName, tempVector);
-    return;
-}
-
-
 
 
 

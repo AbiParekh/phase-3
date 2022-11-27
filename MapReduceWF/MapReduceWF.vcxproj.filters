@@ -24,18 +24,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapReduceSorter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MapReducerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReduceWF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MapReduceSorter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MapInterface.h">

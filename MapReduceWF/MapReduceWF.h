@@ -35,6 +35,7 @@ private:
 
 	bool MapStepDLL(std::string& dllLocaiton, const std::string& inputMapDirectory, const std::string& outputMapDirectory);
 
+	void exportSuccess();
 
 	bool ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputSortDirectory, const std::string&, std::string&);
 

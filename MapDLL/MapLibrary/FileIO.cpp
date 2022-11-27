@@ -71,7 +71,7 @@ bool FileIOManagement::doWriteVectorToFile(const std::string filePath, const std
 		}
 		if (!outFile || !outFile.good())
 		{
-			std::cout << "Error: Unable to create file (" << fileNameAndPath << ") in Write Vector to File Request" << std::endl;
+			std::cout   << __func__ << " ERROR: Unable to create file (" << fileNameAndPath << ") in Write Vector to File Request" << std::endl;
 			result = false;
 
 		}
@@ -90,7 +90,7 @@ bool FileIOManagement::doWriteVectorToFile(const std::string filePath, const std
 	}
 	else
 	{
-		std::cout << "Error:  Invalid Folder Path (" << filePath << ") within the Write Vector To File Request" << std::endl;
+		std::cout   << __func__ <<  " ERROR:  Invalid Folder Path (" << filePath << ") within the Write Vector To File Request" << std::endl;
 		result = false;
 	}
 
@@ -105,7 +105,7 @@ bool FileIOManagement::doReadFileIntoVector(const std::string filePath, const st
 {
 	if (!canAccessFile(filePath, fileName))
 	{
-		std::cout << "Error: Invalid File (" << fileName << ") within the read File Into Vector Request" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Invalid File (" << fileName << ") within the read File Into Vector Request" << std::endl;
 		return false;
 	}
 
@@ -144,12 +144,12 @@ bool FileIOManagement::doValidDirectory(const std::string& folderPath)
 	const std::filesystem::path sandbox{ folderPath };
 	if (!std::filesystem::exists(sandbox))
 	{
-		std::cout << "INFO: The Folder Path: " << folderPath << " does not exist" << std::endl;
+		std::cout   << __func__ <<  " INFO: The Folder Path: " << folderPath << " does not exist" << std::endl;
 		return false;
 	}
 	else if (!std::filesystem::is_directory(sandbox))
 	{
-		std::cout << "Error: Provided Path (" << folderPath << ") is not a directory!" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Provided Path (" << folderPath << ") is not a directory!" << std::endl;
 		return false;
 	}
 
@@ -172,7 +172,7 @@ bool FileIOManagement::doGetListOfTextFiles(const std::string& inputFolder, std:
 			}
 			else
 			{
-				std::cout << "Warning: Ignoring the file " << entry.path().filename() << " as it is not a text file " << std::endl;
+				std::cout   << __func__ <<  " Warning: Ignoring the file " << entry.path().filename() << " as it is not a text file " << std::endl;
 			}
 		}
 
@@ -198,7 +198,7 @@ bool FileIOManagement::doCreateDirectory(const std::string& folderPath, const st
 		// If the folder exist delete the contents 
 		if (validDirectory(newFolderPathFull))
 		{
-			std::cout << "Warning: Already Exist, deleting directory and contents " << std::endl;
+			std::cout   << __func__ <<  " Warning: Already Exist, deleting directory and contents " << std::endl;
 			fs::remove_all("newFolderPathFull"); // Deletes one or more files recursively.
 		}
 
@@ -207,7 +207,7 @@ bool FileIOManagement::doCreateDirectory(const std::string& folderPath, const st
 
 		if (!validDirectory(newFolderPathFull))
 		{
-			std::cout << "Error: Unable to Create the Directory (" << newFolderPathFull << ")" << std::endl;
+			std::cout   << __func__ <<  " Error: Unable to Create the Directory (" << newFolderPathFull << ")" << std::endl;
 		}
 	}
 	else

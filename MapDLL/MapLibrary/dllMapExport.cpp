@@ -9,7 +9,7 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void*)
 
 IMPEXP void* CreateMapClassInstance()
 {
-    std::cout << "INFO: Accessing DLL Function (CreateMapClassInstance)" << std::endl;
+    std::cout   << __func__ <<  " INFO: Accessing DLL Function (CreateMapClassInstance)" << std::endl;
     Map* temp = new Map;
     return ((void*)temp);
 }

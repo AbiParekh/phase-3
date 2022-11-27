@@ -26,17 +26,17 @@ bool MapReducerConfig::parseConfigurationFile(std::string locationOfConfiguratio
 		{
 			if (!parseConfigurationLine(item))
 			{
-				std::cout << "ERROR: Unable to parse Configuration Item: " << item << std::endl;
+				std::cout   << __func__ <<  "ERROR: Unable to parse Configuration Item: " << item << std::endl;
 			}
 		}
 		if (!requiredConfigurationItemsPresent())
 		{
-			std::cout << "ERROR: Configuration Files is Missing Parameters" << std::endl;
+			std::cout   << __func__ <<  "ERROR: Configuration Files is Missing Parameters" << std::endl;
 			results = false;
 		}
 		else if (!validateDirectories())
 		{
-			std::cout << "ERROR: Configuration Settings were not valid" << std::endl;
+			std::cout   << __func__ <<  "ERROR: Configuration Settings were not valid" << std::endl;
 			results = false;
 		}
 	}
@@ -50,14 +50,14 @@ bool MapReducerConfig::validateDirectories()
 	// SROA: Determine if Directory Existing if it does and its not valid
 	if (results == false)
 	{
-		std::cout << "ERROR: You must specify a valid input Directory" << std::endl;
+		std::cout   << __func__ <<  "ERROR: You must specify a valid input Directory" << std::endl;
 		return results;
 	}
 
 	results = results && fileManager.validDirectory(outputDirectory_);
 	if (results == false)
 	{
-		std::cout << "ERROR: You must specify a valid Output Directory" << std::endl;
+		std::cout   << __func__ <<  "ERROR: You must specify a valid Output Directory" << std::endl;
 		return results;
 	}
 
@@ -65,7 +65,7 @@ bool MapReducerConfig::validateDirectories()
 	results = results && fileManager.validDirectory(intermediateDirectory_);
 	if (results == false)
 	{
-		std::cout << "ERROR: You must specify a valid Intermediate Directory" << std::endl;
+		std::cout   << __func__ <<  "ERROR: You must specify a valid Intermediate Directory" << std::endl;
 		return results;
 	}
 
@@ -77,7 +77,7 @@ bool MapReducerConfig::validateDirectories()
 		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForSorterOutput);
 		if (results == false)
 		{
-			std::cout << "Couldn't create MapOutput or ReducerOutput, Terminating" << std::endl;
+			std::cout   << __func__ <<  "ERROR: Couldn't create MapOutput or ReducerOutput, Terminating" << std::endl;
 			return results;
 		}
 	}
@@ -93,7 +93,7 @@ bool MapReducerConfig::validateDirectories()
 			std::string totalFilePath = outputDirectory_ + "\\" + fileList.at(count);
 			if (!fileManager.deleteFile(totalFilePath))
 			{
-				std::cout << "Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
+				std::cout   << __func__ <<  "ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
 				results = false;
 			}
 		}
@@ -113,10 +113,10 @@ bool MapReducerConfig::setDefaultDirectory(const std::string defaultDir, std::st
 		results = fileManager.createDirectory("..\\", defaultDir + "Dir_Default"); //temp directory in working folder
 		if (results == false)
 		{
-			std::cout << "Terminating: Failed to create default " + defaultDir + " directory" << std::endl;
+			std::cout   << __func__ <<  "Terminating: Failed to create default " + defaultDir + " directory" << std::endl;
 			return results;
 		}
-		std::cout << "INFO: New defaultDir directory ..\\" + defaultDir + "Dir_Default created successfully!" << std::endl;
+		std::cout   << __func__ <<  "INFO: New defaultDir directory ..\\" + defaultDir + "Dir_Default created successfully!" << std::endl;
 	}
 	return results;
 }
@@ -130,17 +130,17 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 	std::size_t pos = line.find(" ");
 	if(pos == std::string::npos)
 	{
-		std::cout << "ERROR: \"" << line << "\" Not Formatted Correctly (Single Word)"  << std::endl;
+		std::cout   << __func__ <<  "ERROR: \"" << line << "\" Not Formatted Correctly (Single Word)"  << std::endl;
 		return false;
 	}
 	configurationParameter = line.substr(0, pos);
 	configurationValue = line.substr(pos+1);
 #ifdef false
-	std::cout << "configurationParameter: '" << configurationParameter << "' configurationValue: '" << configurationValue << "'" << std::endl;
+	std::cout   << __func__ <<  "configurationParameter: '" << configurationParameter << "' configurationValue: '" << configurationValue << "'" << std::endl;
 #endif
 	if(configurationValue.find(" ") != std::string::npos)
 	{	
-		std::cout << "ERROR: \"" << line << "\" Not Formatted Correctly (More then 2 Words in a Single Line)" << std::endl;
+		std::cout   << __func__ <<  "ERROR: \"" << line << "\" Not Formatted Correctly (More then 2 Words in a Single Line)" << std::endl;
 		return false;
 	}
 
@@ -156,7 +156,7 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 	else if(configurationParameter.compare("Number_Of_Reduce_Threads")	== 0) numberOfReduceThreads_ = std::stoul(configurationValue, nullptr, 0);
 	else
 	{
-		std::cout << "ERROR: Unknown Configuration Parameter (" << configurationParameter << ") with the value (" << configurationValue << ")" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Unknown Configuration Parameter (" << configurationParameter << ") with the value (" << configurationValue << ")" << std::endl;
 	}
 	return true;
 }
@@ -166,38 +166,38 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 	bool results = true;
 	if (inputDirectory_.compare("") ==0)
 	{
-		std::cout << "ERROR: Input Directory not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Input Directory not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
 	if (mapDllLocation_.compare("") == 0)
 	{
-		std::cout << "ERROR: Map DLL Location not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Map DLL Location not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
 	if (reduceDllLocation_.compare("") == 0)
 	{
-		std::cout << "ERROR: Reduce DLL Location not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Reduce DLL Location not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
 	if (outputDirectory_.compare("") == 0) 
 	{  // If User did not provided output Dir, then it should be created by default as it is an optional parameter
-//		std::cout << "INFO: Optional Parameter Output Directory Not Set" << std::endl;
+//		std::cout   << __func__ <<  "INFO: Optional Parameter Output Directory Not Set" << std::endl;
 		if (setDefaultDirectory("Output", outputDirectory_) == false)
 		{
-			std::cout << "ERROR: Unable to est Output Directory. " << std::endl;
+			std::cout   << __func__ <<  "ERROR: Unable to est Output Directory. " << std::endl;
 			results =  false;
 		};
 	}
 
 	if (intermediateDirectory_.compare("") == 0)  
 	{   // If User did not provided IntermediateDirectory, then it should be created by default as it is an optional parameter
-//		std::cout << "INFO: Optional Parameter Intermediate Directory Not Set" << std::endl;
+//		std::cout   << __func__ <<  "INFO: Optional Parameter Intermediate Directory Not Set" << std::endl;
 		if (setDefaultDirectory("Working", intermediateDirectory_) == false)
 		{
-			std::cout << "ERROR: Unable to est intermediatw Directory. " << std::endl;
+			std::cout   << __func__ <<  "ERROR: Unable to est intermediatw Directory. " << std::endl;
 			results = false;
 		};
 
@@ -205,12 +205,12 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 
 	if (numberOfMapThreads_ == 0)
 	{
-		std::cout << "ERROR: Map Threads not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Map Threads not identified in Configuration File" << std::endl;
 		results = false;
 	}
 	if (numberOfReduceThreads_ == 0)
 	{
-		std::cout << "ERROR: Reduce Threads not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  "ERROR: Reduce Threads not identified in Configuration File" << std::endl;
 		results = false;
 	}
 

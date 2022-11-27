@@ -30,29 +30,26 @@ public:
     ~Reduce();
     //destructor
 
-    bool reduceFile(const std::string& folderPath, const std::string& fileName);
-    //import data from sorter class
-    //pass 
-
     void setParameters(std::string OutputDirectory, std::string ThreadName);
 
-protected:
+    void ProofDLLWorks();
 
-    bool reduce(const std::string inputString);
+    bool reduceFile(const std::string& folderPath, const std::string& fileName);
 
-    bool parseLine(const std::string line, std::pair<std::string, uint32_t>& outputPair);
+    void exportResults();
 
-    bool getNumberOfInstances(std::string format, std::string delim, uint32_t& instance);
+
+ protected:
+
 
     bool Export(const std::string& fileName, std::pair<std::string, uint32_t>& outputPair);
-
-    void exportSuccess();
 
     bool AddFileContentsToSorter(const std::string& folderPath, const std::string& fileName);
 
     bool AddPhraseToMap(const std::string& formattedWord, const std::string& startString, const std::string& endString);
 
     bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord);
+    
 
 private:
 

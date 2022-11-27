@@ -145,7 +145,6 @@
   <ItemGroup>
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MapReduceSorter.cpp" />
     <ClCompile Include="MapReduceWF.cpp" />
     <ClCompile Include="MapReducerConfig.cpp" />
   </ItemGroup>
@@ -154,7 +153,6 @@
     <ClInclude Include="MapReducerConfig.h" />
     <ClInclude Include="MapInterface.h" />
     <ClInclude Include="MapReduceWF.h" />
-    <ClInclude Include="MapReduceSorter.h" />
     <ClInclude Include="ReduceInterface.h" />
   </ItemGroup>
   <ItemGroup>
