@@ -1,2 +1,13 @@
 # User-specific files
 x64/
+/config.txt
+*.sqlite
+*.lock
+*.vsidx
+*.db
+*.wsuo
+*.ipch
+*.suo
+*.db-shm
+*.db-wal
+*.opendb
