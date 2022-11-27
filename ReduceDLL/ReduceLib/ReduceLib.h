@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "FileIO.h"
 #include "framework.h"
 #include "ReduceInterface.h"
@@ -29,21 +30,13 @@ public:
     ~Reduce();
     //destructor
 
-    bool reduceFile(const std::string& folderPath, const std::string& fileName, std::string& outFile);
+    bool reduceFile(const std::string& folderPath, const std::string& fileName);
     //import data from sorter class
     //pass 
 
-    void ProofDLLWorks()
-    {
-        std::cout << "Your were the chosen one Anikin!" << std::endl;
-        std::cout << "I live my life a quarter mile at a time" << std::endl;
-    }
-
-    void setParameters(std::string OutputDirectory);
+    void setParameters(std::string OutputDirectory, std::string ThreadName);
 
 protected:
-
-    bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord);
 
     bool reduce(const std::string inputString);
 
@@ -55,16 +48,26 @@ protected:
 
     void exportSuccess();
 
+    bool AddFileContentsToSorter(const std::string& folderPath, const std::string& fileName);
+
+    bool AddPhraseToMap(const std::string& formattedWord, const std::string& startString, const std::string& endString);
+
+    bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord);
 
 private:
 
-    std::vector<std::pair<string, uint32_t>> reduced_vector;
     std::string outputDirectory;
     size_t bufferLimit; //memory limits
     string intermediateDirectory; //saved to buffer
-    string initialDirectory; //FileIO
+    string threadName;
     FileIOManagement IO_management; //using fileio class
     const std::string outputFileName = "ReducerOutput.txt";;
+
+    /// <summary>
+    /// Collection of Data for Usage. The Key is a String while the Value is the usage count 
+    /// </summary>
+    std::map<std::string, uint32_t> sortedMap;
+
 
 };
 
