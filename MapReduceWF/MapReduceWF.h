@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <thread>	
-#include "MapReduceSorter.h"
 #include "FileIO.h"
 #include "MapReducerConfig.h"
 #include "ReduceInterface.h"
@@ -53,8 +52,5 @@ private:
 	
 	// Map Object 
 	FileIOManagement fileManager;
-
-	// 
-	MapSorter mapSorter;
 
 };

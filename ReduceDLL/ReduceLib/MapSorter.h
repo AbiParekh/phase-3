@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <string>
 #include <map>
@@ -7,32 +8,27 @@
 class MapSorter
 {
 public:
-		//Constructor
-		MapSorter(std::string mapName, std::string SortName);
+	//Constructor
+	MapSorter(std::string mapName, std::string SortName);
 
-		bool sortMappedFiles(std::string outputMapDirectory, std::string outpuSortDirectory, std::string& outputFileName);
+	bool sortMappedFiles(std::string outputMapDirectory, std::string outpuSortDirectory, std::string& outputFileName);
 
 protected:
 
-	
+
 	/// <summary>
 	/// S-OConnor TODO Fill Out Comments
 	/// </summary>
 	/// <param name="folderPath"></param>
 	/// <param name="fileName"></param>
 	/// <returns></returns>
-	bool AddFileContentsToSorter(const std::string& folderPath, const std::string& fileName);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	bool AddPhraseToMap(const std::string& formattedWord, const std::string& startString, const std::string& endString);
+	
 
 	/// <summary>
 	/// 
 	/// </summary>
 	bool doSortMappedFiles(std::string outputMapDirectory, std::string outpuSortDirectory, std::string& outputFileName);
-	
+
 	/// <summary>
 	/// S-OConnor TODO Fill Out Comments
 	/// </summary>
@@ -45,10 +41,6 @@ protected:
 
 	void getSortedMap(std::map<std::string, uint32_t>& returnMap);
 
-	/// <summary>
-	/// 
-	/// </summary>
-	bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord);
 
 
 	/// <summary>

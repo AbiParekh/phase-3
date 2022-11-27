@@ -15,8 +15,7 @@ void randomFunctionGenerator()
 }
 
 MapReducer::MapReducer(std::string configFileLocation) :
-	configurationFileLocation_(configFileLocation), 
-	mapSorter("", "") {}
+	configurationFileLocation_(configFileLocation) {}
 
 
 bool MapReducer::reduce(std::string& outputFileName)
@@ -138,13 +137,11 @@ bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string
 
 	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
 	{
-		std::cout << "JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
+		std::cout << "INFO: Joining Thread" << Rthreads << std::endl;
 
 		if (reduceThreadList.at(Rthreads).joinable() == true)
 		{
-			std::cout << "POST JOINABLE CHECK FOR THREAD" << Rthreads << std::endl;
 			reduceThreadList.at(Rthreads).join();
-			std::cout << "POST JOIN CHECK FOR THREAD" << Rthreads << std::endl;
 		}
 	}
 
