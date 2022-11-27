@@ -74,7 +74,7 @@ bool MapReducerConfig::validateDirectories()
 	if (results == true)
 	{
 		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForMapOutput);
-		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForSorterOutput);
+		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForReducerOutput);
 		if (results == false)
 		{
 			std::cout   << __func__ <<  "ERROR: Couldn't create MapOutput or ReducerOutput, Terminating" << std::endl;
@@ -251,7 +251,7 @@ std::string MapReducerConfig::getMapTempOutputFolder()
 
 std::string MapReducerConfig::getReduceTempOutputFolder()
 {
-	return folderNameForSorterOutput;
+	return folderNameForReducerOutput;
 }
 
 uint32_t MapReducerConfig::getNumberOfMapThreads()

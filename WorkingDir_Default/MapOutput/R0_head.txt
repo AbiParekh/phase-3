@@ -1,4 +1,0 @@
-("shoulders",1)
-("shoulders",1)
-("nose",1)
-("shoulders",1)

@@ -24,46 +24,39 @@ bool MapReducer::reduce(std::string& outputFileName)
 
 /*doReduce function within the class ensures a directory exists, then proceeds read files in the input directory, it takes files from the input directory and writes
 the file content into a vector named lines, calling the map function, it takes each line processes it by removing an punctuation and emits a value 1 for each key.
-after it completes it flushes and empties the cache. Now calling the sorter class, it shuffles each value to its respective keyword, such as ([for], [1,1,1,1])
-Later the reducer is called to collect each instance for a ketword and sum it to reduce the amount of memory used by each value. after completion it exports the data
-to the outputDirectory*/
+after it completes it flushes and empties the cache. */
 bool MapReducer::doReduce(std::string& outputFileName)
-{	/*
+{	
 	if (mapReduceConfig.parseConfigurationFile(configurationFileLocation_))
 	{
 		std::shared_ptr<MapInterface> mapIF = nullptr;
 		std::vector<std::string> fileList;
-		std::string sortedFileName;
 		std::string inputMapDirectory = mapReduceConfig.getInputDir();
 		std::string outputMapDirectory = mapReduceConfig.getIntermediateDir() + "\\" + mapReduceConfig.getMapTempOutputFolder();
 		std::string outputReduceDirectory = mapReduceConfig.getIntermediateDir() + "\\" + mapReduceConfig.getReduceTempOutputFolder();
 		std::string mapDLLLocation = mapReduceConfig.getMapDllLocation();
 		std::string reduceDLLLocation = mapReduceConfig.getReduceDllLocation();
-		if (!MapStepDLL(mapDLLLocation, inputMapDirectory, outputMapDirectory)) return false;
-
+		if (!MapStepDLL(mapDLLLocation, inputMapDirectory, outputMapDirectory))
+		{
+			std::cout << __func__ << " ERROR" << std::endl;
+			return false;
+		}
+		else if(!ReduceStepDLL(reduceDLLLocation, outputMapDirectory, outputReduceDirectory, outputFileName))
+		{
+			std::cout << __func__ <<  " ERROR: Unable to Reduce Mapped Files Output" << std::endl;
+			return false;
+		}
+		// ABI TODO: Call Finialize Class/Method
+		// else if(FinializeReducerFiles())
+		// {
+		//  
+		// }
 	}
 	else
 	{
 		return false;
 	}
-	*/
-
-	// SORA UNCOMMENT OUTif (!mapSorter.sortMappedFiles(outputMapDirectory, outputReduceDirectory, sortedFileName))
-	// SORA UNCOMMENT OUT{
-	// SORA UNCOMMENT OUT	std::cout   << __func__ <<  "ERROR: Unable to Sort Mapped Files Output" << std::endl;
-	// SORA UNCOMMENT OUT	return false;
-	// SORA UNCOMMENT OUT}
-
-	// SORA UNCOMMENT OUT if (!ReduceStepDLL(reduceDLLLocation, outputReduceDirectory, sortedFileName, outputFileName))
-	// {
-	//	std::cout   << __func__ <<  "ERROR: Unable to Reduce Mapped Files Output" << std::endl;
-	//	return false;
-	// }
-
-	// ABI TODO: Call Finialize Class/Method
-
-	std::string temp, temp2, temp3, temp4;
-	ReduceStepDLL("", "", "", temp4);
+	
 	return true;
 }
 
@@ -153,32 +146,25 @@ void MapReducer::exportSuccess()
 
 bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string& outputMapDirectory, const std::string& outputReduceDirectory, std::string& outputFileName)
 {
-	// CONSTANTS FOR TESTING JUST A PIECE
-	std::string outputMapDirectory2 = "..\\WorkingDir_Default\\MapOutput";
-	std::string outputReduceDir = "..\\WorkingDir_Default\\SorterOutput";
-	std::string reduceDLLLocation = ".\\..\\ReduceDLL\\ReduceLib\\x64\\Debug\\ReduceLib.dll";
-	uint32_t numberofReduceThreads = 2;
-
-
 	bool result = true;
 	std::vector<std::vector<std::string>> fileListVector;
-
+	uint32_t numberOfReduceThreads = mapReduceConfig.getNumberOfReduceThreads();
 	// Get File List for Reducer Threads
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	for (uint32_t Rthreads = 0; Rthreads < numberOfReduceThreads; Rthreads++)
 	{
 		std::vector<std::string> fileList;
 		std::string startingSubString = "r" + std::to_string(Rthreads) + "_";
-		fileManager.getListOfTextFilesBasedOnStart(outputMapDirectory2, startingSubString, fileList);
+		fileManager.getListOfTextFilesBasedOnStart(outputMapDirectory, startingSubString, fileList);
 		fileListVector.push_back(fileList);
 	}
 
 	// Launch Reducer Threads
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	for (uint32_t Rthreads = 0; Rthreads < numberOfReduceThreads; Rthreads++)
 	{
 		std::cout   << __func__ <<  "INFO: Launching Reducer Thread #" << Rthreads << std::endl;
 		std::string threadID = "r" + std::to_string(Rthreads);
 		std::vector<std::string> fileList = fileListVector.at(Rthreads);
-		std::thread reduceThread(&ReduceThreadFunction, reduceDLLLocation, outputReduceDir, fileListVector.at(Rthreads), threadID, outputMapDirectory2);
+		std::thread reduceThread(&ReduceThreadFunction, dllLocaiton, outputReduceDirectory, fileListVector.at(Rthreads), threadID, outputMapDirectory);
 
 		reduceThreadList.push_back(std::move(reduceThread));
 	}
@@ -186,7 +172,7 @@ bool MapReducer::ReduceStepDLL(const std::string& dllLocaiton, const std::string
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
 
-	for (uint32_t Rthreads = 0; Rthreads < numberofReduceThreads; Rthreads++)
+	for (uint32_t Rthreads = 0; Rthreads < numberOfReduceThreads; Rthreads++)
 	{
 		std::cout   << __func__ <<  "INFO: Attempting to Join Reducer Thread " << Rthreads << std::endl;
 

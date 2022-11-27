@@ -1,0 +1,6 @@
+("welcome",1)
+("to",1)
+("hadoop",1)
+("hadoop",1)
+("hadoop",1)
+("bad",1)

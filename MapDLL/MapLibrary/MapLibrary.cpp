@@ -188,7 +188,6 @@ bool Map::exportMap(const string filename, string token, std::mutex& mtx)
 	// Buffer reached or flush called dump to FileIO
 	if (tokenWords.size() == maxBufferSize || token == "") 
 	{
-		std::cout << "\n****R_Threads: " << R_threads << std::endl;
 		bool isExported = emptyCache();
 		vector<string> tempFiles;
 
@@ -200,7 +199,7 @@ bool Map::exportMap(const string filename, string token, std::mutex& mtx)
 			//writes contents of buffer to file in temp directory
 			for (int R = 0; R < R_threads; R++)
 			{
-				tempFiles.push_back("R" + std::to_string(R) + "_" + filename);
+				tempFiles.push_back("r" + std::to_string(R) + "_" + filename);
 				std::unique_lock<std::mutex> lock(mtx);
 				mapFileManager.writeVectorToFile(this->tempDirectory, tempFiles[R], exportBuffers[R], true);
 				lock.unlock();

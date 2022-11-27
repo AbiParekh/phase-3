@@ -65,6 +65,6 @@ private:
 
 	const std::string folderNameForMapOutput = "MapOutput";
 
-	const std::string folderNameForSorterOutput = "SorterOutput";
+	const std::string folderNameForReducerOutput = "ReducerOutput";
 
 };
