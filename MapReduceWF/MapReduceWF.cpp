@@ -7,6 +7,9 @@
 #include "MapReduceWF.h"
 #include <iostream>
 #include <Windows.h>
+
+
+
 // PUBLIC METHODS
 
 void randomFunctionGenerator()
@@ -68,6 +71,9 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 	std::vector<std::string> CompletefileList;
 	std::string mapDLLLocation = dllLocation;
 	uint32_t bufferSize = 3000;
+	std::mutex mtx; //common mutex used to lock writes to file
+	static std::condition_variable cond;
+	//static std::queue<int> q;
 
 	bool results = true;
 		
@@ -107,12 +113,14 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 
 		//void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string>&fileList, uint32_t bufferSize, std::string threadname, );
 
-		std::thread mapThread(MapThreadFunction, mapDLLLocation, inputMapDirectory, outputMapDirectory, fileList, bufferSize, threadID, totalReduceThreads);
+		std::thread mapThread(MapThreadFunction, mapDLLLocation, inputMapDirectory, outputMapDirectory, fileList, bufferSize, threadID, totalReduceThreads, ref(mtx), ref(cond));
 		mapThreadList.push_back(std::move(mapThread));
 	}
 
 	// CONDITONAL VARIABLE LOGIC
 	// ESA TODO: setup condition_Variable to handle async writes to MapOutput
+
+
 
 
 	// JOIN THREADS LOGIC
@@ -127,15 +135,17 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 	return results;
 
 }
-//void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string>&fileList, uint32_t bufferSize, std::string threadname, );
 
 
-void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads)
+void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads, std::mutex &mtx, std::condition_variable& cond)
 {
 	HINSTANCE hdllMap = NULL;
 	pvFunctv CreateMap;
 	MapInterface* mapIF = NULL;
 	FileIOManagement fileManager;
+	//static std::condition_variable cond;
+	//static std::queue<int> q;
+
 
 	hdllMap = LoadLibraryA(dllLocation.c_str());
 	if (hdllMap != NULL)
@@ -168,11 +178,12 @@ void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std:
 						{
 							uint32_t count = 0;
 							//Map Function --> Map
-							mapIF->createMap(fileList.at(fileCount), lines.at(fileLine));
+							//ESA Note: Conditional_variable May not be necessary for Map since writes can process in any order once lock is avail
+							mapIF->createMap(fileList.at(fileCount), lines.at(fileLine), ref(mtx));
 						}
 
 						//Map Function --> Export
-						mapIF->flushMap(fileList.at(fileCount));
+						mapIF->flushMap(fileList.at(fileCount), ref(mtx));
 						lines.resize(0);
 					}
 				}

@@ -10,11 +10,14 @@
 #include "MapReducerConfig.h"
 #include "ReduceInterface.h"
 #include "MapInterface.h"
+#include <mutex>
+//#include <queue>
+
 
 typedef void* (*pvFunctv)();
 
 void ReduceThreadFunction(std::string dllLocation, std::string outputReduceDirectory, std::vector<std::string> temp, std::string threadname, std::string MapFilesDirectory);
-void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads);
+void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string> fileList, uint32_t bufferSize, std::string threadname, uint32_t totalReduceThreads, std::mutex & mtx, std::condition_variable& cond);
 
 class MapReducer
 {

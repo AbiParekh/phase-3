@@ -1,4 +1,4 @@
-Input_Directory ..\inputDir\
+Input_Directory ..\inputDirWithShake\
 Map_DLL_Location .\..\MapDLL\MapLibrary\MapLibrary.dll
 Reduce_DLL_Location .\..\ReduceDLL\ReduceLib\x64\Debug\ReduceLib.dll
 Number_Of_Map_Threads 5

@@ -7,6 +7,8 @@
 #include "framework.h"
 #include "MapInterface.h"
 #include <variant>
+#include <mutex>
+#include <queue>
 
 using std::string;
 using std::vector;
@@ -37,10 +39,10 @@ public:
 	Map(const Map& t);
 
 	//tokenizes words, accepts a key(filename) and value(single line) from fileIO
-	 bool createMap(string filename, string inputLine);
+	 bool createMap(string filename, string inputLine, std::mutex& mtx);
 
 	//clears Maps contents, prepares to read in new file
-	bool flushMap(const string filename);
+	bool flushMap(const string filename, std::mutex& mtx);
 
 	// converts a string into lowercase
 	string lowerCaseMap(const string&);
@@ -57,7 +59,7 @@ protected: // PRIVATE MEMBER FUNCTIONS
 	bool emptyCache();
 
 	//accepts key(filename) and value(vector of tokenized strings) sends to output when buffer is full
-	bool exportMap(string filename, string token);
+	bool exportMap(string filename, string token, std::mutex& mtx);
 
 	//checks each character to remove punctuation from word, validates apostrophe as char
 	bool removePunctuation(const string str, const int tokenStart, const int tokenEnd);
