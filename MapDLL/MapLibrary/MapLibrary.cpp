@@ -24,7 +24,7 @@ Map::Map(const string intermediate, size_t sizeOfBuffer)
 Map::Map(const Map& t)
 {
 	maxBufferSize = t.maxBufferSize;
-	exportBuffer = t.exportBuffer;
+	exportBuffers = t.exportBuffers;
 	tokenWords = t.tokenWords;
 	tempDirectory = t.tempDirectory;
 	mapFileManager = t.mapFileManager;
@@ -38,10 +38,21 @@ void Map::ProofDLLWorks()
 	std::cout << "Your A WIZARD HARRY" << std::endl;
 }
 
-void Map::setParameters(const string intermediateIn, size_t sizeOfBufferIn)
+void Map::setParameters(const string intermediateIn, size_t sizeOfBufferIn, size_t threads)
 {
 	tempDirectory = intermediateIn;
 	maxBufferSize = sizeOfBufferIn;
+	R_threads = threads;
+}
+
+
+string Map::printParameters(const string& input)
+{
+
+	string test = input;
+	size_t testI = R_threads;
+	test = "R_threads = " + std::to_string(R_threads);
+	return test;
 }
 
 bool Map::removePunctuation(const string str, const int tokenStart, const int tokenEnd)
@@ -84,6 +95,30 @@ bool Map::removePunctuation(const string str, const int tokenStart, const int to
 	return false;
 }
 
+string Map::addFileSuffix(const string filename, int index)
+{
+	string tempFile = filename;
+	size_t lastdot = filename.find_last_of("."); //finds extension if any in file
+	if (lastdot == std::string::npos) //filename has no extensions
+	{
+		return filename + '_' + std::to_string(index);
+	}
+	else //need to append index before extension from file
+	{
+		return filename.substr(0, lastdot) + '_' + std::to_string(index) + filename.substr(lastdot);
+	}
+}
+
+string Map::lowerCaseMap(const string& input)
+{
+	string output;
+	for (char c : input)
+	{
+		output += tolower(c);
+	}
+	return output;
+}
+
 bool Map::createMap(const string filename, const string strCAPS)
 {
 	bool isExported{ false };
@@ -112,39 +147,10 @@ bool Map::createMap(const string filename, const string strCAPS)
 
 bool Map::flushMap(const string fileName)
 {
-	bool isFlushed = exportMap(fileName, fileIndex);
+	bool isFlushed = exportMap(fileName, "");
 	std::cout << "Mapped " << fileIndex << " Partition(s) of " << fileName << " to tempDirectory: " << this->tempDirectory << std::endl;
 	fileIndex = 0;
 	return isFlushed; //nothing to flush
-}
-
-bool Map::exportMap(const string filename, string token)
-{
-	bool isExported{ false };
-	tokenWords.push_back(std::make_pair(token, 1));
-	if (tokenWords.size() == maxBufferSize) // Buffer reached dump to FileIO
-	{
-		//std::cout << "cache is full, exporting to file" << std::endl;
-		isExported = exportMap(filename, fileIndex);
-	}
-	return isExported; //False if nothing exported
-};
-
-bool Map::exportMap(const string fileName, int index)
-{
-	bool isExported = emptyCache();
-
-	//Prevents duplicate write to file if current buffer was already exported
-	if (isExported) {
-		string tempFile = addFileSuffix(fileName, index);
-		fileIndex = index + 1;
-
-		//writes contents of buffer to file in temp directory
-		mapFileManager.writeVectorToFile(this->tempDirectory, tempFile, exportBuffer);
-		//std::cout << "Map has exported file: " << this->tempDirectory << '/' << tempFile << std::endl;
-	}
-
-	return isExported; //False if nothing exported
 }
 
 bool Map::emptyCache()
@@ -153,51 +159,53 @@ bool Map::emptyCache()
 
 	if (tokenWords.size() > 0)
 	{
-		exportBuffer.resize(0);
-		size_t index = exportBuffer.size(); //implicitly set index back to zero
+		exportBuffers.resize(0);
+		size_t index = 0; 
 
-		exportBuffer.push_back("");
-		isEmptied = true;
-		int i = 0;
-		size_t tk_sz = tokenWords.size(); //token size
-
-		for (int i = 0; i < tk_sz; i++)
+		for (int i = 0; i < R_threads; i++)
 		{
-			if (i > 0) exportBuffer[index] += "\n";
-			exportBuffer[index] += "(\"" + tokenWords[i].first + "\"," + std::to_string(tokenWords[i].second) + ")";
+			exportBuffers.push_back({});
 		}
 
-		tokenWords.erase(tokenWords.begin(), tokenWords.begin() + tk_sz);
+		for (int i = 0, R_Num; i < tokenWords.size(); i++)
+		{
+			R_Num = static_cast<int> (tokenWords[i].first[0]) % R_threads; //adds R_thread process to vector
+			exportBuffers[R_Num].push_back("(\"" + tokenWords[i].first + "\"," + std::to_string(tokenWords[i].second) + ")");
+		}
+
+		tokenWords.erase(tokenWords.begin(), tokenWords.begin() + tokenWords.size());
+		isEmptied = true;
 	}
 	return isEmptied; //False if no cache emptied
 }
 
-string Map::addFileSuffix(const string filename, int index)
+bool Map::exportMap(const string filename, string token)
 {
-	string tempFile = filename;
-	size_t lastdot = filename.find_last_of("."); //finds extension if any in file
-	if (lastdot == std::string::npos) //filename has no extensions
+	bool isExported{ false };
+
+	if (token != "") tokenWords.push_back(std::make_pair(token, 1)); //does not execute on flushMap
+
+	if (tokenWords.size() == maxBufferSize || token == "") // Buffer reached or flush called dump to FileIO
 	{
-		return filename + '_' + std::to_string(index);
+		//std::cout << "cache is full, exporting to file" << std::endl;
+		//isExported = exportMap(filename, fileIndex);
+		std::cout << "\n****R_Threads: " << R_threads << std::endl;
+		bool isExported = emptyCache();
+		vector<string> tempFiles;
+
+		//Prevents duplicate write to file if current buffer was already exported
+		if (isExported) {
+			string tempFile = addFileSuffix(filename, fileIndex);
+			fileIndex++;
+
+			//writes contents of buffer to file in temp directory
+			for (int R = 0; R < R_threads; R++)
+			{
+				tempFiles.push_back("R" + std::to_string(R) + "_" + filename);
+				mapFileManager.writeVectorToFile(this->tempDirectory, tempFiles[R], exportBuffers[R], true);
+			}
+		}
 	}
-	else //need to append index before extension from file
-	{
-		return filename.substr(0, lastdot) + '_' + std::to_string(index) + filename.substr(lastdot);
-	}
+	return isExported; //False if nothing exported
 }
 
-string Map::lowerCaseMap(const string& input)
-{
-	string output;
-	for (char c : input)
-	{
-		output += tolower(c);
-	}
-	return output;
-}
-
-ostream& operator<<(ostream& os, const tokenPair& tp)
-{
-	os << "(\"" << tp.first << "\"" << ", " << tp.second << ")";
-	return os;
-}

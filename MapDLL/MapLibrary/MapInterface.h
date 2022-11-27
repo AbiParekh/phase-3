@@ -4,7 +4,7 @@
 
 using std::string;
 
-class MapInterface
+class InterfaceMap
 {
 public:
 
@@ -17,7 +17,9 @@ public:
 	// converts a string into lowercase
 	virtual string lowerCaseMap(const string&) = 0;
 
-	virtual void setParameters(const string intermediate, size_t sizeOfBuffer) = 0;
+	virtual void setParameters(const string intermediate, size_t sizeOfBuffer, size_t R_threads) = 0;
+
+	virtual string printParameters(const string&) = 0;
 
 	virtual void ProofDLLWorks() =0;
 };

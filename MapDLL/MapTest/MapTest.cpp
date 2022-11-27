@@ -4,7 +4,7 @@
 #include <iostream>
 #include <Windows.h>
 
-#include "MapInterface.h"
+#include <MapInterface.h>
 
 typedef void* (*pvFunctv)();
 
@@ -12,19 +12,25 @@ typedef void* (*pvFunctv)();
 int main()
 {
 	HINSTANCE hdll = NULL;
-	InterfaceMap* piFoo = NULL;
-	pvFunctv CreateFoo;
-	hdll = LoadLibrary(TEXT("MapLibrary.dll"));
+	InterfaceMap* myMap = NULL;
+	pvFunctv CreateMap;
+	hdll = LoadLibrary(TEXT("..//MapLibrary//x64//Debug//MapLibrary.dll"));
 
 	if (hdll != NULL) {
-		CreateFoo = (pvFunctv) (GetProcAddress(hdll, "CreateMapClassInstance"));
-		if (CreateFoo != nullptr)
+		CreateMap = (pvFunctv) (GetProcAddress(hdll, "CreateMapClassInstance"));
+		if (CreateMap != nullptr)
 		{
-			piFoo = static_cast<InterfaceMap*> (CreateFoo());	// get pointer to object
+			myMap = static_cast<InterfaceMap*> (CreateMap());	// get pointer to object
 
-			if (piFoo != NULL)
+			if (myMap != NULL)
 			{
-				piFoo->ProofDLLWorks();
+				//myMap->ProofDLLWorks();
+				myMap->setParameters("..\\middleDir", 3000, 3);
+				std::cout << myMap->printParameters("HI");
+				myMap->createMap("FakeFile.txt", "apple, banana, carrot, dates, eggplant, figs, grapes, honey, icecreame, jackfruit, kiwi, lemon, melon, nectarine, orange," 
+					"pomegranite, quiche, raisin, sunflower, tangerine, udon, vanilla, watermelon, xigua, yogurt, zucchini 'apostrophe, o'clock");
+				myMap->flushMap("FakeFile.txt");
+
 			}
 			else
 			{
@@ -43,7 +49,9 @@ int main()
 		std::cout << "Library load failed!" << std::endl;
 	}
 
+	std::cout << "Press any key to quit";
 	std::cin.get();
+
 	return 0;
 }
 
