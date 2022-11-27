@@ -4,7 +4,7 @@
 
 using std::string;
 
-class MapInterface
+class InterfaceMap
 {
 public:
 
