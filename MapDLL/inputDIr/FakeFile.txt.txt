@@ -1,0 +1,2 @@
+apple, banana, carrot, dates, eggplant, figs, grapes, honey, icecreame, jackfruit, kiwi, lemon, melon, nectarine, orange
+pomegranite, quiche, raisin, sunflower, tangerine, udon, vanilla, watermelon, xigua, yogurt, zucchini 'apostrophe, o'clock
