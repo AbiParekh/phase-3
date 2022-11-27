@@ -119,7 +119,7 @@ string Map::lowerCaseMap(const string& input)
 	return output;
 }
 
-bool Map::createMap(const string filename, const string strCAPS, std::mutex& mtx)
+bool Map::createMap(const string filename, const string strCAPS)
 {
 	bool isExported{ false };
 	string parsedWord, str{ lowerCaseMap(strCAPS) };
@@ -132,7 +132,7 @@ bool Map::createMap(const string filename, const string strCAPS, std::mutex& mtx
 			if (tokenStart != tokenEnd) //not first char in word
 			{
 				parsedWord = str.substr(tokenStart, tokenEnd - tokenStart);
-				isExported = exportMap(filename, parsedWord, mtx);
+				isExported = exportMap(filename, parsedWord);
 				tokenStart = tokenEnd + 1;	// moves word start to next char
 			}
 			else if (tokenStart == tokenEnd) //first char in word is a punct
@@ -144,9 +144,9 @@ bool Map::createMap(const string filename, const string strCAPS, std::mutex& mtx
 	return isExported;
 };
 
-bool Map::flushMap(const string fileName, std::mutex& mtx)
+bool Map::flushMap(const string fileName)
 {
-	bool isFlushed = exportMap(fileName, "", mtx);
+	bool isFlushed = exportMap(fileName, "");
 	std::cout << "Mapped " << fileIndex << " Partition(s) of " << fileName << " to tempDirectory: " << this->tempDirectory << std::endl;
 	fileIndex = 0;
 	return isFlushed; //nothing to flush
@@ -178,7 +178,7 @@ bool Map::emptyCache()
 	return isEmptied; //False if no cache emptied
 }
 
-bool Map::exportMap(const string filename, string token, std::mutex& mtx)
+bool Map::exportMap(const string filename, string token)
 {
 	bool isExported{ false };
 
@@ -200,9 +200,7 @@ bool Map::exportMap(const string filename, string token, std::mutex& mtx)
 			for (int R = 0; R < R_threads; R++)
 			{
 				tempFiles.push_back("r" + std::to_string(R) + "_" + filename);
-				std::unique_lock<std::mutex> lock(mtx);
 				mapFileManager.writeVectorToFile(this->tempDirectory, tempFiles[R], exportBuffers[R], true);
-				lock.unlock();
 			}
 		}
 	}

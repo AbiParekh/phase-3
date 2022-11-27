@@ -39,10 +39,10 @@ public:
 	Map(const Map& t);
 
 	//tokenizes words, accepts a key(filename) and value(single line) from fileIO
-	 bool createMap(string filename, string inputLine, std::mutex& mtx);
+	 bool createMap(string filename, string inputLine);
 
 	//clears Maps contents, prepares to read in new file
-	bool flushMap(const string filename, std::mutex& mtx);
+	bool flushMap(const string filename);
 
 	// converts a string into lowercase
 	string lowerCaseMap(const string&);
@@ -59,7 +59,7 @@ protected: // PRIVATE MEMBER FUNCTIONS
 	bool emptyCache();
 
 	//accepts key(filename) and value(vector of tokenized strings) sends to output when buffer is full
-	bool exportMap(string filename, string token, std::mutex& mtx);
+	bool exportMap(string filename, string token);
 
 	//checks each character to remove punctuation from word, validates apostrophe as char
 	bool removePunctuation(const string str, const int tokenStart, const int tokenEnd);

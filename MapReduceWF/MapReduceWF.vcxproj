@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\config.txt" />
+    <Text Include="..\config_Eman.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
