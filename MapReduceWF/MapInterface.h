@@ -17,5 +17,7 @@ public:
 
 	virtual void setParameters(const std::string intermediate, size_t sizeOfBuffer) = 0;
 
+	virtual std::string printParameters(const std::string&) = 0;
+
 	virtual void ProofDLLWorks() = 0;
 };

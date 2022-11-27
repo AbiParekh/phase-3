@@ -17,7 +17,7 @@ typedef std::pair<string, int> tokenPair;
 
 
 //class MAPLIBRARY_API Map
-class Map : public InterfaceMap
+class Map : public MapInterface
 {
 public:
 
