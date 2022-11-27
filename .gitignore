@@ -1,6 +1,5 @@
 # User-specific files
 x64/
-/config.txt
 *.sqlite
 *.lock
 *.vsidx
@@ -11,3 +10,5 @@ x64/
 *.db-shm
 *.db-wal
 *.opendb
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
