@@ -50,7 +50,7 @@ class Final {
         //join all data items into one vector, adding lines/phrase to map
         //void mergeContent(const string& folderpath, const string& filename);
 
-        bool Final::exportFinal(const std::string& fileName, std::vector<std::string> finVec);
+        bool exportFinal(const std::string& fileName, std::vector<std::string> finVec);
 
         bool finalFile(const std::string line);
 
