@@ -11,6 +11,8 @@ public:
 	std::string getInputDir();
 
 	std::string getOutputDir();
+	
+	std::string getfinalOutputDir();
 
 	std::string getIntermediateDir();
 
@@ -29,6 +31,8 @@ public:
 	void setInputDir(std::string);
 
 	void setOutputDir(std::string);
+	
+	void setfinalOutputDir(std::string);
 
 	void setIntermediateDir(std::string);
 
@@ -55,6 +59,7 @@ protected:
 	std::string inputDirectory_;
 	std::string intermediateDirectory_;
 	std::string outputDirectory_;
+	std::string finalOutputDirectory_;
 	std::string mapDllLocation_;
 	std::string reduceDllLocation_;
 	uint32_t numberOfMapThreads_;
@@ -66,5 +71,7 @@ private:
 	const std::string folderNameForMapOutput = "MapOutput";
 
 	const std::string folderNameForReducerOutput = "ReducerOutput";
+	
+	const std::string folderNameforFinalMergedOutput = "FinalizedOutput";
 
 };
