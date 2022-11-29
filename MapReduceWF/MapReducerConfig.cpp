@@ -6,7 +6,6 @@ MapReducerConfig::MapReducerConfig() :
 	inputDirectory_(""),
 	intermediateDirectory_(""),
 	outputDirectory_(""),
-	finalOutputDirectory_(""),
 	mapDllLocation_(""),
 	reduceDllLocation_(""),
 	numberOfMapThreads_(0),
@@ -62,13 +61,6 @@ bool MapReducerConfig::validateDirectories()
 		return results;
 	}
 
-	results = results && fileManager.validDirectory(finalOutputDirectory_);
-	if (results == false)
-	{
-		std::cout   << __func__ <<  "ERROR: You must specify a valid final Output Directory" << std::endl;
-		return results;
-	}
-	
 	//Check Intermediate Directory
 	results = results && fileManager.validDirectory(intermediateDirectory_);
 	if (results == false)
@@ -81,8 +73,49 @@ bool MapReducerConfig::validateDirectories()
 	// Create Working Directories within the Intermediate Directory
 	if (results == true)
 	{
-		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForMapOutput);
-		results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForReducerOutput);
+		std::string mapDirName = intermediateDirectory_ + "\\" + folderNameForMapOutput;
+		if (fileManager.validDirectory(mapDirName)== true)
+		{
+			std::vector<std::string> fileList;
+			fileManager.getListOfTextFiles(mapDirName, fileList);
+			for (size_t count = 0; count < fileList.size(); count++)
+			{
+				// Stuff exist in output directory...... kill it
+				std::string totalFilePath = mapDirName + "\\" + fileList.at(count);
+				if (!fileManager.deleteFile(totalFilePath))
+				{
+					std::cout << __func__ << "ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
+					results = false;
+				}
+			}
+		}
+		else
+		{
+			results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForMapOutput);
+		}
+
+		std::string reduceDirName = intermediateDirectory_ + "\\" + folderNameForReducerOutput;
+
+		if (fileManager.validDirectory(reduceDirName) == true)
+		{
+			std::vector<std::string> fileList;
+			fileManager.getListOfTextFiles(reduceDirName, fileList);
+			for (size_t count = 0; count < fileList.size(); count++)
+			{
+				// Stuff exist in output directory...... kill it
+				std::string totalFilePath = reduceDirName + "\\" + fileList.at(count);
+				if (!fileManager.deleteFile(totalFilePath))
+				{
+					std::cout << __func__ << "ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
+					results = false;
+				}
+			}
+		}
+		else
+		{
+			results = results && fileManager.createDirectory(intermediateDirectory_, folderNameForReducerOutput);
+		}
+
 		if (results == false)
 		{
 			std::cout   << __func__ <<  "ERROR: Couldn't create MapOutput or ReducerOutput, Terminating" << std::endl;
@@ -121,12 +154,12 @@ bool MapReducerConfig::setDefaultDirectory(const std::string defaultDir, std::st
 		results = fileManager.createDirectory("..\\", defaultDir + "Dir_Default"); //temp directory in working folder
 		if (results == false)
 		{
-			std::cout   << __func__ <<  "Terminating: Failed to create default " + defaultDir + " directory" << std::endl;
+			std::cout << __func__ << "Terminating: Failed to create default " + defaultDir + " directory" << std::endl;
 			return results;
 		}
-		std::cout   << __func__ <<  "INFO: New defaultDir directory ..\\" + defaultDir + "Dir_Default created successfully!" << std::endl;
+		std::cout << __func__ << "INFO: New defaultDir directory ..\\" + defaultDir + "Dir_Default created successfully!" << std::endl;
 	}
-	return results;
+		return results;
 }
 
 bool MapReducerConfig::parseConfigurationLine(std::string line)
@@ -199,18 +232,23 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 			results =  false;
 		};
 	}
-	
-	if (finalOutputDirectory_.compare("") == 0) 
-	{  // If User did not provided output Dir, then it should be created by default as it is an optional parameter
-//		std::cout   << __func__ <<  "INFO: Optional Parameter Output Directory Not Set" << std::endl;
-		if (setDefaultDirectory("finalOutputDirectory", finalOutputDirectory_) == false)
+	else
+	{
+		std::vector<std::string> fileList;
+		fileManager.getListOfTextFiles(outputDirectory_, fileList);
+		for (size_t count = 0; count < fileList.size(); count++)
 		{
-			std::cout   << __func__ <<  "ERROR: Unable to set final Output Directory. " << std::endl;
-			results =  false;
-		};
+			// Stuff exist in output directory...... kill it
+			std::string totalFilePath = outputDirectory_ + "\\" + fileList.at(count);
+			if (!fileManager.deleteFile(totalFilePath))
+			{
+				std::cout << __func__ << "ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
+				results = false;
+			}
+		}
 	}
 	
-
+ 
 	if (intermediateDirectory_.compare("") == 0)  
 	{   // If User did not provided IntermediateDirectory, then it should be created by default as it is an optional parameter
 //		std::cout   << __func__ <<  "INFO: Optional Parameter Intermediate Directory Not Set" << std::endl;
@@ -246,11 +284,6 @@ std::string MapReducerConfig::getInputDir()
 std::string MapReducerConfig::getOutputDir()
 {
 	return outputDirectory_;
-}
-
-std::string MapReducerConfig::getfinalOutputDir()
-{
-	return finalOutputDirectory_;
 }
 
 std::string MapReducerConfig::getIntermediateDir()
@@ -298,10 +331,6 @@ void MapReducerConfig::setOutputDir(std::string out)
 	outputDirectory_ = out;
 }
 
-void MapReducerConfig::setfinalOutputDir(std::string out)
-{
-	finalOutputDirectory_ = out;
-}
 
 void MapReducerConfig::setIntermediateDir(std::string middle)
 {

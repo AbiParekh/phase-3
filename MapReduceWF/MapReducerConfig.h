@@ -12,8 +12,6 @@ public:
 
 	std::string getOutputDir();
 	
-	std::string getfinalOutputDir();
-
 	std::string getIntermediateDir();
 
 	std::string getMapDllLocation();
@@ -59,7 +57,6 @@ protected:
 	std::string inputDirectory_;
 	std::string intermediateDirectory_;
 	std::string outputDirectory_;
-	std::string finalOutputDirectory_;
 	std::string mapDllLocation_;
 	std::string reduceDllLocation_;
 	uint32_t numberOfMapThreads_;
