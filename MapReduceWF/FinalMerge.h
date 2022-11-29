@@ -20,11 +20,6 @@ public:
     //constructor
     Final();
 
-    //final directory will take in type string
-    Final(std::string FinalDir);
-
-    //intermediate memory 
-    Final(const std::string tMemory, size_t size_of_buffer);
 
     //destructor
     ~Final();
@@ -34,12 +29,8 @@ public:
 
     bool mergeFromReduce(std::string& outputFileName);
 
-    
 protected:
 
-    bool mapToVectorConversion(std::map<std::string, uint32_t> mapItems, std::vector<std::string>&  finalOutputVector);
-
-    bool updateMapWithLine(std::string line);
 
     bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord, uint32_t& value);
 

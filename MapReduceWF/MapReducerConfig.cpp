@@ -6,6 +6,7 @@ MapReducerConfig::MapReducerConfig() :
 	inputDirectory_(""),
 	intermediateDirectory_(""),
 	outputDirectory_(""),
+	finalOutputDirectory_(""),
 	mapDllLocation_(""),
 	reduceDllLocation_(""),
 	numberOfMapThreads_(0),
@@ -61,6 +62,13 @@ bool MapReducerConfig::validateDirectories()
 		return results;
 	}
 
+	results = results && fileManager.validDirectory(finalOutputDirectory_);
+	if (results == false)
+	{
+		std::cout   << __func__ <<  "ERROR: You must specify a valid final Output Directory" << std::endl;
+		return results;
+	}
+	
 	//Check Intermediate Directory
 	results = results && fileManager.validDirectory(intermediateDirectory_);
 	if (results == false)
@@ -191,6 +199,17 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 			results =  false;
 		};
 	}
+	
+	if (finalOutputDirectory_.compare("") == 0) 
+	{  // If User did not provided output Dir, then it should be created by default as it is an optional parameter
+//		std::cout   << __func__ <<  "INFO: Optional Parameter Output Directory Not Set" << std::endl;
+		if (setDefaultDirectory("finalOutputDirectory", finalOutputDirectory_) == false)
+		{
+			std::cout   << __func__ <<  "ERROR: Unable to set final Output Directory. " << std::endl;
+			results =  false;
+		};
+	}
+	
 
 	if (intermediateDirectory_.compare("") == 0)  
 	{   // If User did not provided IntermediateDirectory, then it should be created by default as it is an optional parameter
@@ -227,6 +246,11 @@ std::string MapReducerConfig::getInputDir()
 std::string MapReducerConfig::getOutputDir()
 {
 	return outputDirectory_;
+}
+
+std::string MapReducerConfig::getfinalOutputDir()
+{
+	return finalOutputDirectory_;
 }
 
 std::string MapReducerConfig::getIntermediateDir()
@@ -272,6 +296,11 @@ void MapReducerConfig::setInputDir(std::string in)
 void MapReducerConfig::setOutputDir(std::string out)
 {
 	outputDirectory_ = out;
+}
+
+void MapReducerConfig::setfinalOutputDir(std::string out)
+{
+	finalOutputDirectory_ = out;
 }
 
 void MapReducerConfig::setIntermediateDir(std::string middle)
