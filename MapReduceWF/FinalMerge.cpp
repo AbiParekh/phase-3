@@ -17,17 +17,11 @@ using namespace std;
 
 //setting buffer
 Final::Final()
-    : bufferLimit(1024) {
+{
+    finalOutputDirectory = "";
+    reducerOutputDirectory = "";
+
 }
-
-//allocating buffer memory
-Final::Final(std::string FinalDir)
-    : bufferLimit(1024), finalOutputDirectory(FinalDir)
-{}
-
-Final::Final(const string tMemory, size_t size_of_buffer)
-    : intermediateDirectory{ tMemory }, bufferLimit{ size_of_buffer }
-{}
 
 //destructor
 Final::~Final()
@@ -35,74 +29,113 @@ Final::~Final()
 
 
 /*Sets up the FinalOutput Directory, where the a single merged output file and a success file will written to*/
-void Final::setUpFinalDirectory(std::string FinalDirIn)
+void Final::setParameters(std::string reducerOutputDirectoryIn, std::string finalOutputDirectoryIn)
 {
-    finalOutputDirectory = FinalDirIn;
-}
-
-
-/*Function getFileList is used to verify if any files exist in the Reducer Directory
-if there are files, the bool listOfFiles will be set to true, else false*/
-bool Final::getFileList(const std::string& inputFolder, std::vector<std::string>& fileList) {
-    bool listOfFiles = true;
-
-    if (IO_MAN.getListOfTextFiles(inputFolder, fileList)) {
-        bool listOfFiles = true;
-    }
-
-    else {
-        cout << "No files exist in the Reducer Directory" << endl;
-        bool listOfFiles = false;
-    }
-
-    return listOfFiles;
+    reducerOutputDirectory = reducerOutputDirectoryIn;
+    finalOutputDirectory = finalOutputDirectoryIn;
 }
 
 
 /*the function importFromReduce is used for merging data from multiple files into one, the data is obtained from the
 Reducer Directory, and imported into the Final
 */
-bool Final::mergeFromReduce(const std::string& folderPath, const std::string& fileName, std::string& finalOutputVec)
+bool Final::mergeFromReduce(std::string& outputFileName)
 {
-    //import data from multiple files into a vector
-    //have a while loop that says if any files are present in output directory then continue to process
-    //if not then cout << No more files remain for extraction << endl;
-    finalOutputVec = finalOutputFileName;
-
-    //empty vector declared
-    std::vector<std::string> finVec;
-    bool dataImportedSuccess = true;
-    bool listOfFiles;
-
-    if (listOfFiles = true) {
-
-        //read contents from file into finVec
-        if (IO_MAN.readFileIntoVector(folderPath, fileName, finVec))
+    
+    bool results = true;
+    std::vector<std::string> fileList;
+    fileManager.getListOfTextFiles(reducerOutputDirectory, fileList);
+    for (auto file : fileList)
+    {
+        std::vector<std::string> stringList;
+        if (fileManager.readFileIntoVector(reducerOutputDirectory, file, stringList))
         {
-            for (size_t i = 0; i < finVec.size(); i++) {
-
-                if (listOfFiles = false) {
-                    cout << "ERROR: Merge Unsuccessful at line " << finVec.at(i) << endl;
+            for (auto line : stringList)
+            {
+                if (!updateMapWithLine(line))
+                {
+                    std::cout << "ERROR: Can't Update Final Map with Line: " << line << std::endl;
                 }
             }
         }
-
-        else {
-            cout << "ERROR: Issue with transfering data from reducer to Finalier" << endl;
-            dataImportedSuccess = false; //not successful in transfering data
+        else
+        {
+            std::cout << "ERROR: Can't Read File (" << file << ") for the final Merge" << std::endl;
         }
-
     }
+    std::vector<std::string> finalOutputVector;
 
-    return dataImportedSuccess;
+    if (mapToVectorConversion(reducedItems, finalOutputVector))
+    {
+        outputFileName = finalOutputFileName;
+        fileManager.writeVectorToFile(finalOutputDirectory, outputFileName, finalOutputVector);
+    }
+    
+    return results;
 }
 
 
-
-/*export a single output file with all data merged*/
-bool Final::exportFinal(const std::string& fileName, std::vector<std::string> finVec)
+bool Final::mapToVectorConversion(std::map<std::string, uint32_t> mapItems, std::vector<std::string>&  finalOutputVector)
 {
-    IO_MAN.writeVectorToFile(finalOutputDirectory, fileName, finVec, true);
+    std::map<std::string, uint32_t>::iterator begIt = mapItems.begin();
+    for (; begIt != mapItems.end(); ++begIt)
+    {
+        std::string temp;
+        std::pair<std::string, uint32_t> outputPair = *begIt;
+        std::string formattedOutput = "\"" + outputPair.first + "\", " + std::to_string(outputPair.second);
+        finalOutputVector.push_back(formattedOutput);
+    }
+
+    return true;
+}
+
+
+bool Final::updateMapWithLine(std::string line)
+{
+    std::string isolateWord;
+    const std::string WORD_WRAP = "\"";
+    uint32_t value;
+    if (IsolateWord(line, WORD_WRAP, WORD_WRAP, isolateWord, value))
+    {
+        std::map<std::string, uint32_t>::iterator mapIterator = reducedItems.find(isolateWord);
+        if (mapIterator == reducedItems.end())
+        {
+            // The word was not found in the Map therefore add it 
+            reducedItems.insert(std::pair<std::string, uint32_t>(isolateWord, value));
+        }
+        else
+        {
+            // The Word was found in the map increment it
+            mapIterator->second = mapIterator->second + value;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+
+/*The IsolateWord function within the Reduce class has parameters string word, the start of the string, the end of the string, and the isolated string word
+the function locates the first position of the string this assigned as the startString, and it locates the second portion of the string and it assigns this as endsString
+It then formats the strings into a sub string and assigns it to the isolated string.*/
+bool Final::IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord, uint32_t& value)
+{
+    // Isolate Word
+    size_t firstPosition = formattedWord.find(startString);
+    size_t secondPosition = formattedWord.find(endString, firstPosition + 1);
+    if ((firstPosition == std::string::npos) || (secondPosition == std::string::npos)) return false;
+    isloatedWord = formattedWord.substr(firstPosition + 1, secondPosition - (firstPosition + 1));
+
+    // Isolate Value
+    std::string ValueString = formattedWord.substr(secondPosition);
+    size_t valueFirstPosition = formattedWord.find(",");
+    size_t valueSecondPosition = formattedWord.find(")", valueFirstPosition + 1);
+    if ((valueFirstPosition == std::string::npos) || (valueSecondPosition == std::string::npos)) return false;
+    std::string isloatedValue = formattedWord.substr(valueFirstPosition + 1, valueSecondPosition - (valueFirstPosition + 1));
+    value = std::stoul(isloatedValue);
+   
     return true;
 }
 

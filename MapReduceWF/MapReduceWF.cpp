@@ -38,6 +38,9 @@ bool MapReducer::doReduce(std::string& outputFileName)
 		std::string outputReduceDirectory = mapReduceConfig.getIntermediateDir() + "\\" + mapReduceConfig.getReduceTempOutputFolder();
 		std::string mapDLLLocation = mapReduceConfig.getMapDllLocation();
 		std::string reduceDLLLocation = mapReduceConfig.getReduceDllLocation();
+		finalizer.setParameters(outputReduceDirectory, mapReduceConfig.getOutputDir());
+
+
 		if (!MapStepDLL(mapDLLLocation, inputMapDirectory, outputMapDirectory))
 		{
 			std::cout << __func__ << " ERROR" << std::endl;
@@ -48,17 +51,17 @@ bool MapReducer::doReduce(std::string& outputFileName)
 			std::cout << __func__ <<  " ERROR: Unable to Reduce Mapped Files Output" << std::endl;
 			return false;
 		}
-		// ABI TODO: Call Finialize Class/Method
-		// else if(FinializeReducerFiles())
-		// {
-		//  
-		// }
+		else if(!finalizer.mergeFromReduce(outputFileName))
+		{
+			std::cout << __func__ << " ERROR: Unable to Merge all Reduced Values" << std::endl;
+			return false;
+		}
 	}
 	else
 	{
 		return false;
 	}
-	
+	exportSuccess();
 	return true;
 }
 

@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "FileIO.h"
+#include "FinalMerge.h"
 #include "MapReducerConfig.h"
 #include "ReduceInterface.h"
 #include "MapInterface.h"
@@ -54,8 +55,9 @@ private:
 
 	MapReducerConfig mapReduceConfig;
 	
-	// Map Object 
 	FileIOManagement fileManager;
+
+	Final finalizer;
 
 };
 

@@ -30,35 +30,25 @@ public:
     ~Final();
 
     //setting up final directory
-    void setUpFinalDirectory(std::string FinalDirIn);
+    void setParameters(std::string reducerOutputDirectoryIn, std::string finalOutputDirectoryIn);
 
-    bool mergeFromReduce(const std::string& folderPath, const std::string& fileName, std::string& finalVec);
+    bool mergeFromReduce(std::string& outputFileName);
 
-    //function that attaches the merge and export
-    //void finalFile(const string& folderpath, const string& filename, std::string& finalOutputFile);
-
-    //export final output file
-    //void exportFinalResults();
-
+    
 protected:
 
-    //bring in data from reduced files
-    //bool mergeFromReduce(const std::string& folderPath, const std::string& fileName, std::string& finalVec);
+    bool mapToVectorConversion(std::map<std::string, uint32_t> mapItems, std::vector<std::string>&  finalOutputVector);
 
-    bool getFileList(const std::string& inputFolder, std::vector<std::string>& fileList);
+    bool updateMapWithLine(std::string line);
 
-    //join all data items into one vector, adding lines/phrase to map
-    //void mergeContent(const string& folderpath, const string& filename);
-
-    bool exportFinal(const std::string& fileName, std::vector<std::string> finVec);
+    bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord, uint32_t& value);
 
 private:
-    std::string finalOutputDirectory;
-    size_t bufferLimit;
-    std::string intermediateDirectory;
-    FileIOManagement IO_MAN; //using fileIO class
+    std::string reducerOutputDirectory;
+    std::string finalOutputDirectory;    
+    FileIOManagement fileManager; //using fileIO class
     const std::string finalOutputFileName = "FinalOutput.txt";
-    //std::map<std::string, uint32_t> reducedItems;
+    std::map<std::string, uint32_t> reducedItems;
 };
 
 #endif //FINAL_H
