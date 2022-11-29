@@ -18,13 +18,15 @@ public:
 
 	std::string getReduceDllLocation();
 
+	std::string getMapTempOutputFolder();
+
+	std::string getReduceTempOutputFolder();
+
 	uint32_t getNumberOfMapThreads();
 
 	uint32_t getNumberOfReduceThreads();
 
-	std::string getMapTempOutputFolder();
-
-	std::string getReduceTempOutputFolder();
+	uint32_t getMapBufferSize();
 
 	void setInputDir(std::string);
 
@@ -41,6 +43,8 @@ public:
 	void setNumberOfMapThreads(uint32_t);
 
 	void setNumberOfReduceThreads(uint32_t);
+
+	void setMapBufferSize(uint32_t);
 
 	bool parseConfigurationFile(std::string locationOfConfigurationFile);
 
@@ -61,6 +65,7 @@ protected:
 	std::string reduceDllLocation_;
 	uint32_t numberOfMapThreads_;
 	uint32_t numberOfReduceThreads_;
+	uint32_t mapBufferSize_;
 
 private:
 	FileIOManagement fileManager;

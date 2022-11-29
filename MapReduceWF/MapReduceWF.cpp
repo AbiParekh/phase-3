@@ -70,7 +70,6 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 	std::vector<std::vector<std::string>> fileListVector;
 	std::vector<std::string> CompletefileList;
 	std::string mapDLLLocation = dllLocation;
-	uint32_t bufferSize = 3000;
 	std::mutex mtx; //common mutex used to lock writes to file
 	static std::condition_variable cond;
 	//static std::queue<int> q;
@@ -79,8 +78,11 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 		
 	// For the input Directory read the list of files 
 	fileManager.getListOfTextFiles(mapReduceConfig.getInputDir(), CompletefileList);
+	//uint32_t totalMapThreads = mapReduceConfig.getNumberOfMapThreads();
 	uint32_t totalMapThreads = mapReduceConfig.getNumberOfMapThreads();
 	uint32_t totalReduceThreads = mapReduceConfig.getNumberOfReduceThreads();
+	uint32_t bufferSize = mapReduceConfig.getMapBufferSize();
+
 		
 	// setup fileListVector
 	for (size_t count = 0; count < totalMapThreads; count++)

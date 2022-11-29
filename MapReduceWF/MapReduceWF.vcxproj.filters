@@ -55,6 +55,8 @@
     <Text Include="..\config.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\config_Eman.txt" />
+    <Text Include="..\config_Eman.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
