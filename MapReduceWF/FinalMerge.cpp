@@ -81,6 +81,10 @@ bool Final::mergeFromReduce(const std::string& folderPath, const std::string& fi
         {
             for (size_t i = 0; i < finVec.size(); i++) {
 
+                   //should try using a nested for loop
+                    //first loop iterates through list of files
+                    //second loop iterates through contents of the current file
+                        //in 2nd loop append to vector finVec
                 if (listOfFiles = false) {
                     cout << "ERROR: Merge Unsuccessful at line " << finVec.at(i) << endl;
                 }
