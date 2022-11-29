@@ -298,6 +298,11 @@ void MapReducerConfig::setOutputDir(std::string out)
 	outputDirectory_ = out;
 }
 
+void MapReducerConfig::setfinalOutputDir(std::string out)
+{
+	finalOutputDirectory_ = out;
+}
+
 void MapReducerConfig::setIntermediateDir(std::string middle)
 {
 	intermediateDirectory_ = middle;
