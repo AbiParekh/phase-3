@@ -112,7 +112,7 @@ bool MapReducer::MapStepDLL(std::string& dllLocation, const std::string& inputMa
 
 		//void MapThreadFunction(std::string dllLocation, std::string inputDirectory, std::string outputMapDirectory, std::vector<std::string>&fileList, uint32_t bufferSize, std::string threadname, );
 
-		std::thread mapThread(MapThreadFunction, mapDLLLocation, inputMapDirectory, outputMapDirectory, fileList, bufferSize, threadID, totalReduceThreads);
+		std::thread mapThread(&MapThreadFunction, mapDLLLocation, inputMapDirectory, outputMapDirectory, fileList, bufferSize, threadID, totalReduceThreads);
 		mapThreadList.push_back(std::move(mapThread));
 	}
 
