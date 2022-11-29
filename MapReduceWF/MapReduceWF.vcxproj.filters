@@ -27,6 +27,9 @@
     <ClCompile Include="MapReducerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FinalMerge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReduceWF.h">
@@ -44,10 +47,14 @@
     <ClInclude Include="FileIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FinalMerge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\config.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="..\config_Eman.txt" />
   </ItemGroup>
 </Project>

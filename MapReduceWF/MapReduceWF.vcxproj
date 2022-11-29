@@ -144,12 +144,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FileIO.cpp" />
+    <ClCompile Include="FinalMerge.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapReduceWF.cpp" />
     <ClCompile Include="MapReducerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileIO.h" />
+    <ClInclude Include="FinalMerge.h" />
     <ClInclude Include="MapReducerConfig.h" />
     <ClInclude Include="MapInterface.h" />
     <ClInclude Include="MapReduceWF.h" />

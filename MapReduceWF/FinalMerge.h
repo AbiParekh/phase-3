@@ -7,13 +7,11 @@
 #include <string>
 #include <vector>
 #include <map>
-using std::string;
-using std::vector;
 #include <iostream>
 #include <ostream>
 #include "FileIO.h"
 
-typedef std::pair<string, int> finVec;
+typedef std::pair<std::string, int> finVec;
 //typedef std::vector<string> listOfFiles;
 
 class Final {
@@ -26,7 +24,7 @@ public:
     Final(std::string FinalDir);
 
     //intermediate memory 
-    Final(const string tMemory, size_t size_of_buffer);
+    Final(const std::string tMemory, size_t size_of_buffer);
 
     //destructor
     ~Final();
@@ -54,15 +52,10 @@ protected:
 
     bool exportFinal(const std::string& fileName, std::vector<std::string> finVec);
 
-    bool finalFile(const std::string line);
-
-    //export a file with success written in it.
-    void exSuccess();
-
 private:
     std::string finalOutputDirectory;
     size_t bufferLimit;
-    string intermediateDirectory;
+    std::string intermediateDirectory;
     FileIOManagement IO_MAN; //using fileIO class
     const std::string finalOutputFileName = "FinalOutput.txt";
     //std::map<std::string, uint32_t> reducedItems;
