@@ -6,13 +6,13 @@
 #include <fstream>
 #include <ostream>
 #include <Windows.h>
-#include <filesystem>
+//#include <filesystem>
 #include <string>
 #include <vector>
 using std::string;
 using std::vector;
 using namespace std; 
-namespace fs = std::filesystem;
+//namespace fs = std::filesystem;
 
 
 //setting buffer
@@ -44,15 +44,15 @@ void Final::setUpFinalDirectory(std::string FinalDirIn)
 /*Function getFileList is used to verify if any files exist in the Reducer Directory
 if there are files, the bool listOfFiles will be set to true, else false*/
 bool Final::getFileList(const std::string& inputFolder, std::vector<std::string>& fileList) {
-    bool listOfFiles == true;
+    bool listOfFiles = true ;
     
     if (IO_MAN.getListOfTextFiles(inputFolder, fileList)) {
-        bool listOfFiles == true;
+        bool listOfFiles = true ;
     }
 
     else {
         cout << "No files exist in the Reducer Directory" << endl;
-        bool listOfFiles == false;
+        bool listOfFiles =  false ;
     }
 
     return listOfFiles;
@@ -71,17 +71,17 @@ bool Final::mergeFromReduce(const std::string& folderPath, const std::string& fi
 
     //empty vector declared
     std::vector<std::string> finVec;
-    bool dataImportedSuccess == true; 
+    bool dataImportedSuccess =  true ;
     bool listOfFiles;
 
-    if (listOfFiles == true) {
+    if (listOfFiles = true) {
             
         //read contents from file into finVec
         if (IO_MAN.readFileIntoVector(folderPath, fileName, finVec))
             {
                 for (size_t i = 0; i < finVec.size(); i++) {
                     
-                    if (listOfFiles == false) {
+                    if (listOfFiles = false) {
                         cout << "ERROR: Merge Unsuccessful at line " << finVec.at(i) << endl;
                     }
                 } 
@@ -90,7 +90,7 @@ bool Final::mergeFromReduce(const std::string& folderPath, const std::string& fi
 
         else {
             cout << "ERROR: Issue with transfering data from reducer to Finalier" << endl;
-            dataImportedSuccess == false; //not successful in transfering data
+            dataImportedSuccess = false; //not successful in transfering data
         }
 
         //exSuccess();
@@ -118,8 +118,9 @@ bool Final::finalFile(const std::string line) {
 
     bool dataImportedSuccess;
     std::vector<string> finVec;
-    if (dataImportedSuccess == true) {
+    if (dataImportedSuccess = true) {
         
+        bool exportSuccess = true;
         exportFinal(finalOutputFileName, finVec);
 
     }
@@ -129,7 +130,7 @@ bool Final::finalFile(const std::string line) {
         cout << "ERROR: failure to package and export the merged file" << endl;
     }
 
-    return;
+    return exportSuccess;
 }
 
 
