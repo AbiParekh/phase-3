@@ -31,7 +31,10 @@ public:
 
 protected:
 
+    bool mapToVectorConversion(std::map<std::string, uint32_t> mapItems, std::vector<std::string>& finalOutputVector);
 
+    bool updateMapWithLine(std::string line);
+    
     bool IsolateWord(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord, uint32_t& value);
 
 private:
