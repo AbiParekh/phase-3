@@ -34,16 +34,7 @@ public:
 
     bool mergeFromReduce(const std::string& folderPath, const std::string& fileName, std::string& finalVec);
 
-    //function that attaches the merge and export
-    //void finalFile(const string& folderpath, const string& filename, std::string& finalOutputFile);
-
-    //export final output file
-    //void exportFinalResults();
-
 protected:
-
-    //bring in data from reduced files
-    //bool mergeFromReduce(const std::string& folderPath, const std::string& fileName, std::string& finalVec);
 
     bool getFileList(const std::string& inputFolder, std::vector<std::string>& fileList);
 
