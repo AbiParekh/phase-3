@@ -9,7 +9,8 @@ MapReducerConfig::MapReducerConfig() :
 	mapDllLocation_(""),
 	reduceDllLocation_(""),
 	numberOfMapThreads_(0),
-	numberOfReduceThreads_(0) {}
+	numberOfReduceThreads_(0),
+	mapBufferSize_(0){}
 
 bool MapReducerConfig::parseConfigurationFile(std::string locationOfConfigurationFile)
 {		
@@ -194,7 +195,8 @@ bool MapReducerConfig::parseConfigurationLine(std::string line)
 	else if(configurationParameter.compare("Output_Directory")			== 0) outputDirectory_			= configurationValue;
 	else if(configurationParameter.compare("Temp_Directory")			== 0) intermediateDirectory_	= configurationValue;
 	else if(configurationParameter.compare("Number_Of_Map_Threads")		== 0) numberOfMapThreads_		= std::stoul(configurationValue, nullptr, 0);
-	else if(configurationParameter.compare("Number_Of_Reduce_Threads")	== 0) numberOfReduceThreads_ = std::stoul(configurationValue, nullptr, 0);
+	else if(configurationParameter.compare("Number_Of_Reduce_Threads")	== 0) numberOfReduceThreads_	= std::stoul(configurationValue, nullptr, 0);
+	else if (configurationParameter.compare("Map_Buffer_Size")			== 0) mapBufferSize_			= std::stoul(configurationValue, nullptr, 0);
 	else
 	{
 		std::cout   << __func__ <<  "ERROR: Unknown Configuration Parameter (" << configurationParameter << ") with the value (" << configurationValue << ")" << std::endl;
@@ -207,19 +209,19 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 	bool results = true;
 	if (inputDirectory_.compare("") ==0)
 	{
-		std::cout   << __func__ <<  "ERROR: Input Directory not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Input Directory not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
 	if (mapDllLocation_.compare("") == 0)
 	{
-		std::cout   << __func__ <<  "ERROR: Map DLL Location not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Map DLL Location not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
 	if (reduceDllLocation_.compare("") == 0)
 	{
-		std::cout   << __func__ <<  "ERROR: Reduce DLL Location not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Reduce DLL Location not identified in Configuration File" << std::endl;
 		results = false;
 	}
 
@@ -228,7 +230,7 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 //		std::cout   << __func__ <<  "INFO: Optional Parameter Output Directory Not Set" << std::endl;
 		if (setDefaultDirectory("Output", outputDirectory_) == false)
 		{
-			std::cout   << __func__ <<  "ERROR: Unable to est Output Directory. " << std::endl;
+			std::cout   << __func__ <<  " ERROR: Unable to est Output Directory. " << std::endl;
 			results =  false;
 		};
 	}
@@ -242,7 +244,7 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 			std::string totalFilePath = outputDirectory_ + "\\" + fileList.at(count);
 			if (!fileManager.deleteFile(totalFilePath))
 			{
-				std::cout << __func__ << "ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
+				std::cout << __func__ << " ERROR: Unable to Delete (" << totalFilePath << ") in the Output Directory" << std::endl;
 				results = false;
 			}
 		}
@@ -254,7 +256,7 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 //		std::cout   << __func__ <<  "INFO: Optional Parameter Intermediate Directory Not Set" << std::endl;
 		if (setDefaultDirectory("Working", intermediateDirectory_) == false)
 		{
-			std::cout   << __func__ <<  "ERROR: Unable to est intermediatw Directory. " << std::endl;
+			std::cout   << __func__ <<  " ERROR: Unable to est intermediatw Directory. " << std::endl;
 			results = false;
 		};
 
@@ -262,12 +264,17 @@ bool MapReducerConfig::requiredConfigurationItemsPresent()
 
 	if (numberOfMapThreads_ == 0)
 	{
-		std::cout   << __func__ <<  "ERROR: Map Threads not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Map Threads not identified in Configuration File" << std::endl;
 		results = false;
 	}
 	if (numberOfReduceThreads_ == 0)
 	{
-		std::cout   << __func__ <<  "ERROR: Reduce Threads not identified in Configuration File" << std::endl;
+		std::cout   << __func__ <<  " ERROR: Number of Reduce Threads not identified in Configuration File" << std::endl;
+		results = false;
+	}
+	if (mapBufferSize_ == 0)
+	{
+		std::cout << __func__ << " ERROR: Buffer Size missing from Configuration File. Try: Map_Buffer_Size 3000" << std::endl;
 		results = false;
 	}
 
@@ -321,6 +328,11 @@ uint32_t MapReducerConfig::getNumberOfReduceThreads()
 	return numberOfReduceThreads_;
 }
 
+uint32_t MapReducerConfig::getMapBufferSize()
+{
+	return mapBufferSize_;
+}
+
 void MapReducerConfig::setInputDir(std::string in)
 {
 	inputDirectory_ = in;
@@ -355,4 +367,9 @@ void MapReducerConfig::setNumberOfMapThreads(uint32_t threadNumber)
 void MapReducerConfig::setNumberOfReduceThreads(uint32_t threadNumber)
 {
 	numberOfReduceThreads_ = threadNumber;
+}
+
+void MapReducerConfig::setMapBufferSize(uint32_t bufferSize)
+{
+	mapBufferSize_ = bufferSize;
 }

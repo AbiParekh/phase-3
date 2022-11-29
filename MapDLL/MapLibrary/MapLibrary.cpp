@@ -5,7 +5,7 @@
 
 
 Map::Map()
-	:maxBufferSize{ 1024 } // defaults sizeOfBuffer to 1k tokenPairs
+	//:maxBufferSize{ 1024 } // defaults sizeOfBuffer to 1k tokenPairs
 {};
 
 Map::~Map()
