@@ -21,11 +21,14 @@ Running Program from CMD Terminal
         Number_Of_Reduce_Threads 4
         Map_Buffer_Size 3000
         
+        
   3. In terminal change directory to path of executable:
         cd \phase-3\MapReduceWF\MapReduceWF.exe
         
   4. Run program passing config file as argument i.e.:   
-        MapReduceWF.exe ..\config.txt
+        MapReduceWF.exe ..\textFiles\config.txt
         
   5. If execution passes the debug messages will print:
         "Successfully Reduced Input Directory into the file: FinalOutput.txt!"
+        
+  6. confirm files have reduced in 
