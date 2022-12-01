@@ -140,14 +140,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\FileIO.h" />
+    <ClInclude Include="..\..\common\ReduceInterface.h" />
     <ClInclude Include="dllReduceExport.h" />
-    <ClInclude Include="FileIO.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="ReduceInterface.h" />
     <ClInclude Include="ReduceLib.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FileIO.cpp" />
+    <ClCompile Include="..\..\common\FileIO.cpp" />
     <ClCompile Include="ReduceLib.cpp" />
     <ClCompile Include="dllReduceExport.cpp" />
   </ItemGroup>

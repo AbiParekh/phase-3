@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "FileIO.h"
+#include "../../common/FileIO.h"
 #include "framework.h"
-#include "ReduceInterface.h"
+#include "../../common/ReduceInterface.h"
 
 using std::vector;
 using std::string;
@@ -31,6 +31,8 @@ public:
     //destructor
 
     void setParameters(std::string OutputDirectory, std::string ThreadName);
+
+    void getParameters(std::string& OutputDirectory, std::string& ThreadName);
 
     void ProofDLLWorks();
 

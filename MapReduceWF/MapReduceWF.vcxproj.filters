@@ -18,9 +18,6 @@
     <ClCompile Include="MapReduceWF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileIO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,24 +27,27 @@
     <ClCompile Include="FinalMerge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\FileIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReduceWF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MapInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReduceInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MapReducerConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileIO.h">
+    <ClInclude Include="FinalMerge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FinalMerge.h">
+    <ClInclude Include="..\common\FileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\MapInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ReduceInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

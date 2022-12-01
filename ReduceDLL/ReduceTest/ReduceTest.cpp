@@ -3,61 +3,122 @@
 
 #include <iostream>
 #include <Windows.h>
-#include "ReduceInterface.h"
+#include "../ReduceLib/ReduceLib.h"
 #include <iostream>
-#include <filesystem>
 
-namespace fs = std::filesystem;
+void ReportResults(std::map<std::string, bool> outputMap);
+bool Test_setParameters();
+bool Test_IsolateWord();
 
-typedef void* (*pvFunctv)();
 
-int main()
+
+
+class ReducerTestFramework : public Reduce
 {
-	HINSTANCE hdll = NULL;
-	ReduceInterface* piFoo = NULL;
-	pvFunctv CreateFoo;
+public:
+	ReducerTestFramework() {}
 
-	std::cout << "Current path is " << fs::current_path() << '\n'; // (1)
-    std::cout << "Current path is " << fs::current_path() << '\n';
-	
-	hdll = LoadLibrary(TEXT("..\\ReduceLib\\x64\\Debug\\ReduceLib.dll"));
-
-	if (hdll != NULL)
+	bool isolateWordFramework(const std::string& formattedWord, const std::string& startString, const std::string& endString, std::string& isloatedWord)
 	{
-		CreateFoo = (pvFunctv)(GetProcAddress(hdll, "CreateReduceClassInstance"));
-		if (CreateFoo != nullptr)
-		{
-			piFoo = static_cast<ReduceInterface*> (CreateFoo());	// get pointer to object
-
-			if (piFoo != NULL)
-			{
-				piFoo->ProofDLLWorks();
-			}
-			else
-			{
-				std::cout << "Could not create ReduceInterface Class." << std::endl;
-			}
-		}
-		else
-		{
-			std::cout << "Did not load CreateReduceClassInstance correctly." << std::endl;
-		}
-
-		FreeLibrary(hdll);
+		bool result = IsolateWord(formattedWord, startString, endString, isloatedWord);
+		return result;
 	}
-	else
+
+
+	bool AddPhraseToMapFramework(const std::string& phrase, const std::string& startString, const std::string& endString)
 	{
-		std::cout << "Library load failed!" << std::endl;
+		return AddPhraseToMap(phrase, startString, endString);
 	}
+
+};
+
+
+
+int main(int argc, char* argv[])
+{
+	std::map<std::string, bool>  testResults;
+
+	// readFileIntoVector Test
+	std::pair<std::string, bool> setParams("Test_setParameters", Test_setParameters());
+	testResults.insert(setParams);
+
+
+	// validDirectory Test   
+	std::pair<std::string, bool> IsolateWord("Test_IsolateWord", Test_IsolateWord());
+	testResults.insert(IsolateWord);
+
+
+	ReportResults(testResults);
+
+	return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+void ReportResults(std::map<std::string, bool> outputMap)
+{
+	std::cout << "\n\n\n\n\n" << std::endl;
+	std::cout << "========================================== Test Results ==========================================" << std::endl;
+	bool results = true;
+	for (std::map<std::string, bool>::iterator outputMapIt = outputMap.begin(); outputMapIt != outputMap.end(); outputMapIt++)
+	{
+		std::string resultsformatted = "";
+		if (outputMapIt->second == 0) resultsformatted = "FAIL";
+		else  resultsformatted = "PASS";
+		std::cout << "Test: " << outputMapIt->first << "; Result: " << resultsformatted << std::endl;
+	}
+	std::cout << "==================================================================================================" << std::endl;
+}
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+bool Test_setParameters()
+{
+	Reduce temp;
+	bool results = true;
+	std::string first = "first";
+	std::string second = "second";
+	std::string checkerf, checkers;
+	temp.setParameters(first, second);
+	temp.getParameters(checkerf, checkers);
+	if (first != checkerf) results = false;
+	if (second != checkers) results = false;
+	return results;
+}
+
+bool Test_IsolateWord()
+{
+
+	bool results_IsolateWord = true;
+	std::string delim = "\"";
+	std::string formattedWord = "(\"row\", 1)";
+	std::string formattedWord2 = "(\"depth_charge\", 1)";
+	std::string formattedWord3 = "NO Deliminator";
+	std::string isloatedWord = "";
+	std::string isloatedWord2 = "";
+	std::string isloatedWord3 = "";
+	ReducerTestFramework reduce;
+	bool results = reduce.isolateWordFramework(formattedWord, delim, delim, isloatedWord);
+
+	int correctWord = isloatedWord.compare("row");
+	if (correctWord != 0 || results == false)
+	{
+		std::cout << "Test_IsolateWord: Unable to Isolate row" << std::endl;
+		results_IsolateWord = false;
+	}
+
+
+	results = reduce.isolateWordFramework(formattedWord2, delim, delim, isloatedWord2);
+	correctWord = isloatedWord2.compare("depth_charge");
+	if (correctWord != 0 || results == false)
+	{
+		std::cout << "Test_IsolateWord: Unable to Isolate depth_charge" << std::endl;
+		results_IsolateWord = false;
+	}
+
+	results = reduce.isolateWordFramework(formattedWord3, delim, delim, isloatedWord3);
+	if (results != false)
+	{
+		std::cout << "Test_IsolateWord: did not fail when deliminator is missing" << std::endl;
+		results_IsolateWord = false;
+	}
+
+	return results_IsolateWord;
+}
+

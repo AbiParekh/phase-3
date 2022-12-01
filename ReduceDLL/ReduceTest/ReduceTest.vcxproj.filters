@@ -18,9 +18,18 @@
     <ClCompile Include="ReduceTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ReduceLib\ReduceLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\FileIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReduceInterface.h">
+    <ClInclude Include="..\ReduceLib\ReduceLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\FileIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

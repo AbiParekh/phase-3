@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "FileIO.h"
+#include "../common/FileIO.h"
 
 class MapReducerConfig
 {
