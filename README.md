@@ -28,7 +28,5 @@ Running Program from CMD Terminal
   4. Run program passing config file as argument i.e.:   
         MapReduceWF.exe ..\textFiles\config.txt
         
-  5. If execution passes the debug messages will print:
+  5. If execution passes the debug messages will print the below message. Open the text file to confirm reduction processed all words from input files:
         "Successfully Reduced Input Directory into the file: FinalOutput.txt!"
-        
-  6. confirm files have reduced in 
