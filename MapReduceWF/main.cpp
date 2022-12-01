@@ -23,11 +23,13 @@ int main(int argc, char* argv[])
 	std::vector<std::string>::iterator argVecIT = find(argumentVector.begin(), argumentVector.end(), "-help");
 	if (argVecIT != argumentVector.end())
 	{
+		std::cin.get();
 		return -1;
 	}
 	else if (argumentVector.size() != 2)
 	{
 		printHelp();
+		std::cin.get();
 		return -1;
 	}
 
@@ -43,7 +45,9 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "Failed to Reduce Input Directory!" << std::endl;
 	}
-	
+
+
+	std::cout << "\nPress any key to exit... " << std::endl;
 	return 0;
 }
 
@@ -63,7 +67,8 @@ void printBanner()
 void printHelp()
 {
 	std::cout << "The Program should provide the location to a configuration file with the required  information. " << std::endl;
-	std::cout << " Program's READEM explains Configruation File Style and required information " << std::endl;
+	std::cout << "Program's READEM explains Configruation File Style and required information " << std::endl;
+	std::cout << "\nPress any key to exit... " << std::endl;
 }
 
 void convertArgsToStrings(int numberOfArguments, char* argumentArray[], std::vector<std::string>& argumentVector)
