@@ -13,7 +13,7 @@ Tips for Getting Started:
 
 
 Running Program from CMD Terminal
-  1. Open "config.txt" and adjust the following default parameters as needed to point to the correct directories and run the appropriate threads
+  1. Open "config.txt" and adjust the following default parameters as needed to point to the correct directories and run the appropriate threads:
         Input_Directory ..\inputDir\
         Map_DLL_Location .\..\MapDLL\MapLibrary\MapLibrary.dll
         Reduce_DLL_Location .\..\ReduceDLL\ReduceLib\ReduceLib.dll
@@ -21,11 +21,11 @@ Running Program from CMD Terminal
         Number_Of_Reduce_Threads 4
         Map_Buffer_Size 3000
         
-  3. In terminal change directory to path of executable
+  3. In terminal change directory to path of executable:
         cd \phase-3\MapReduceWF\MapReduceWF.exe
         
   4. Run program passing config file as argument i.e.:   
         MapReduceWF.exe ..\config.txt
         
-  5. If execution passes the debug messages will print: \
+  5. If execution passes the debug messages will print:
         "Successfully Reduced Input Directory into the file: FinalOutput.txt!"
