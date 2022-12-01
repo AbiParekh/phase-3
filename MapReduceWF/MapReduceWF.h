@@ -8,11 +8,11 @@
 #include <mutex>
 #include <iostream>
 
-#include "FileIO.h"
+#include "../common/FileIO.h"
 #include "FinalMerge.h"
 #include "MapReducerConfig.h"
-#include "ReduceInterface.h"
-#include "MapInterface.h"
+#include "../common/MapInterface.h"
+#include "../common/ReduceInterface.h"
 
 
 typedef void* (*pvFunctv)();

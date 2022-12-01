@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MapReduceWF.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MapReducerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FinalMerge.cpp">
+    <ClCompile Include="FileIOTester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\FileIO.cpp">
@@ -32,30 +23,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MapReduceWF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MapReducerConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FinalMerge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\FileIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\MapInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ReduceInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\config.txt">
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\boatOutput.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="..\config_Eman.txt">
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\createdboatOutput.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\createdboatOutputAppend.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\boat.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

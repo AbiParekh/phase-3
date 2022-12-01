@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{2afa537a-ebe8-4edd-a04c-a2a32ce3da1d}</ProjectGuid>
-    <RootNamespace>MapReduceWF</RootNamespace>
+    <ProjectGuid>{43a383a4-6ee3-4e07-a30c-9949d874530e}</ProjectGuid>
+    <RootNamespace>Tester</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>FileIOTester</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,18 +106,11 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -127,39 +121,26 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\FileIO.cpp" />
-    <ClCompile Include="FinalMerge.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MapReduceWF.cpp" />
-    <ClCompile Include="MapReducerConfig.cpp" />
+    <ClCompile Include="FileIOTester.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\FileIO.h" />
-    <ClInclude Include="..\common\MapInterface.h" />
-    <ClInclude Include="..\common\ReduceInterface.h" />
-    <ClInclude Include="FinalMerge.h" />
-    <ClInclude Include="MapReducerConfig.h" />
-    <ClInclude Include="MapReduceWF.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\config.txt" />
-    <Text Include="..\config_Eman.txt" />
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\boat.txt" />
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\boatOutput.txt" />
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\createdboatOutput.txt" />
+    <Text Include="..\..\phase-1\mapReduceCMake\src\FileIO\ConfigFiles\createdboatOutputAppend.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

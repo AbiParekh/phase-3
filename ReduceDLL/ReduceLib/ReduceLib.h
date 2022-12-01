@@ -32,6 +32,8 @@ public:
 
     void setParameters(std::string OutputDirectory, std::string ThreadName);
 
+    void getParameters(std::string& OutputDirectory, std::string& ThreadName);
+
     void ProofDLLWorks();
 
     bool reduceFile(const std::string& folderPath, const std::string& fileName);

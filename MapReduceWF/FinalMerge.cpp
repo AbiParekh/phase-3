@@ -1,7 +1,7 @@
 //The Final class contains the main fuctions for combining the results from the Reduce class, and merging them into one output file
 
 #include "FinalMerge.h"
-#include "FileIO.h"
+#include "../common/FileIO.h"
 #include <iostream>
 #include <fstream>
 #include <ostream>

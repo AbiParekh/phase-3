@@ -31,6 +31,12 @@ void Reduce::setParameters(std::string OutputDirIn, std::string ThreadName)
     threadName = ThreadName;
 }
 
+void Reduce::getParameters(std::string& OutputDirectoryOut, std::string& ThreadNameOut)
+{
+    OutputDirectoryOut = outputDirectory;
+    ThreadNameOut = threadName;
+}
+
 void Reduce::ProofDLLWorks()
 {
     std::cout << "THIS IS PROOF THE REDUCE DLL IS WORKING!" << std::endl;

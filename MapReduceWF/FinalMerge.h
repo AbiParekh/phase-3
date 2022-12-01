@@ -9,7 +9,7 @@
 #include <map>
 #include <iostream>
 #include <ostream>
-#include "FileIO.h"
+#include "../common/FileIO.h"
 
 typedef std::pair<std::string, int> finVec;
 //typedef std::vector<string> listOfFiles;
