@@ -21,7 +21,7 @@ Running Program from CMD Terminal
         Number_Of_Reduce_Threads 4
         Map_Buffer_Size 3000
         
-  3. In terminal change directory to path of executaable
+  3. In terminal change directory to path of executable
         cd \phase-3\MapReduceWF\MapReduceWF.exe
         
   4. Run program passing config file as argument i.e.:   
