@@ -21,13 +21,13 @@
     <ClInclude Include="ReduceLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dllReduceExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReduceInterface.h">
+    <ClInclude Include="..\..\common\FileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\ReduceInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +35,10 @@
     <ClCompile Include="ReduceLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileIO.cpp">
+    <ClCompile Include="dllReduceExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllReduceExport.cpp">
+    <ClCompile Include="..\..\common\FileIO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
